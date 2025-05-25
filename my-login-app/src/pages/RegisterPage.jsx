@@ -32,7 +32,7 @@ function RegisterPage() {
     } catch (err) {
       setError('註冊失敗，請稍後再試');
     } finally {
-      setLoading(false); // ✅ 不管成功失敗都會關閉 loading
+      setLoading(false); // 不管成功失敗都會關閉 loading
     }
   };
 
