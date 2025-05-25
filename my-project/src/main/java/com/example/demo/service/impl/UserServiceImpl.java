@@ -205,7 +205,7 @@ public class UserServiceImpl implements UserService {
         VerificationToken newToken = new VerificationToken(null, token, user, LocalDateTime.now().plusHours(24));
         tokenRepository.save(newToken);
 
-        String verifyUrl = baseUrl + "/users/verify?token=" + token;
+        String verifyUrl = "http://localhost:5173/verify?token=" + token;
         String subject = "請驗證您的帳號";
         String content = "<p>親愛的用戶您好，</p>"
                        + "<p>請點擊下方連結完成帳號驗證：</p>"
