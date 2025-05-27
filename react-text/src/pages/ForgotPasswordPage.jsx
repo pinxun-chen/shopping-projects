@@ -34,7 +34,7 @@ function ForgotPasswordPage() {
 
   return (
    <div style={{ maxWidth: 400, margin: '4rem auto', padding: '2rem', border: '1px solid #ccc', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', fontFamily: 'Arial' }}>
-      <h2 style={{ textAlign: 'center', color: '#007bff' }}>忘記密碼</h2>
+      <h2 className="text-2xl font-bold mb-4 text-center text-blue-600">忘記密碼</h2>
       {message && <p style={{ color: 'green', fontWeight: 'bold' }}>{message}</p>}
       {error && <p style={{ color: 'red', fontWeight: 'bold' }}>{error}</p>}
       <form onSubmit={handleSubmit}>

@@ -44,7 +44,7 @@ function RegisterPage() {
 
   return (
     <div style={{ maxWidth: '400px', margin: '4rem auto', padding: '2rem', border: '1px solid #ccc', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', fontFamily: 'Arial' }}>
-      <h2 style={{ textAlign: 'center', color: '#007bff' }}>帳號註冊</h2>
+      <h2 className="text-2xl font-bold mb-4 text-center text-blue-600">帳號註冊</h2>
       <form onSubmit={handleSubmit}>
         <label style={{ fontWeight: 'bold' }}>使用者名稱</label><br />
         <input name="username" onChange={handleChange} placeholder="帳號" required style={{ width: '100%', padding: '8px', marginBottom: '1rem' }} /><br />

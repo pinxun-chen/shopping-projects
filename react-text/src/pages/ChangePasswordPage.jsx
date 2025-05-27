@@ -15,7 +15,7 @@ function ChangePasswordPage() {
 
   return (
     <div>
-      <h2>變更密碼</h2>
+      <h2 className="text-2xl font-bold mb-4 text-center text-blue-600">變更密碼</h2>
       <form onSubmit={handleSubmit}>
         <input name="username" placeholder="帳號" onChange={handleChange} required /><br />
         <input name="oldPassword" placeholder="舊密碼" onChange={handleChange} required /><br />

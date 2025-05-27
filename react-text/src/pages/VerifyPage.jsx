@@ -14,7 +14,7 @@ function VerifyPage() {
         .then(result => {
           if (result.status === 200) {
             localStorage.setItem("verifyMessage", result.message); // 暫存訊息
-            navigate('/'); // 回登入頁
+            navigate('/login'); // 回登入頁
           } else {
             setStatus(result.message || '驗證失敗');
           }

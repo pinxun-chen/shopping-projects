@@ -34,12 +34,12 @@ function ResetPasswordPage() {
 
   return (
     <div style={{ maxWidth: 400, margin: '4rem auto', padding: '2rem', border: '1px solid #ccc', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', fontFamily: 'Arial', textAlign: 'center' }}>
-      <h2 style={{ color: '#007bff' }}>重設密碼</h2>
+      <h2 className="text-2xl font-bold mb-4 text-center text-blue-600">重設密碼</h2>
 
       {message && (
         <>
           <p style={{ color: 'green', fontWeight: 'bold', margin: '1rem 0' }}>{message}</p>
-          <button onClick={() => navigate('/')} style={{ padding: '10px 20px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer' }}>
+          <button onClick={() => navigate('/login')} style={{ padding: '10px 20px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer' }}>
             返回登入
           </button>
         </>
