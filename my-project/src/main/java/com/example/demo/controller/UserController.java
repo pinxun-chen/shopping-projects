@@ -5,8 +5,6 @@ import com.example.demo.model.dto.ChangePasswordRequestDto;
 import com.example.demo.model.dto.RegisterRequestDto;
 import com.example.demo.model.dto.UserCert;
 import com.example.demo.model.dto.UserDto;
-import com.example.demo.model.entity.User;
-import com.example.demo.model.entity.VerificationToken;
 import com.example.demo.response.ApiResponse;
 import com.example.demo.service.CertService;
 import com.example.demo.service.UserService;
@@ -18,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
