@@ -13,7 +13,6 @@ import VerifyPage from './pages/VerifyPage';
 import HomePage from './pages/HomePage';
 import ProductListPage from './pages/ProductListPage';
 
-const ProductPage = () => <div className="p-4">所有商品</div>;
 const CategoryPage = () => <div className="p-4">商品分類</div>;
 const CartPage = () => <div className="p-4">購物車</div>;
 
@@ -53,7 +52,7 @@ function App() {
       {/* 導覽列 */}
       <nav className="bg-white border-b p-4 flex justify-between items-center shadow-sm">
         <div className="text-xl font-bold">
-          <Link to="/">購物網站</Link>
+          <Link to="/">Home</Link>
         </div>
         <div className="space-x-4">
           <Link to="/products" className="hover:underline">所有商品</Link>
@@ -69,8 +68,8 @@ function App() {
           )}
           {loggedIn && (
             <>
-              <Link to="/cart" className="border px-2 py-1 rounded">購物車</Link>
               <button onClick={handleLogout} className="bg-gray-800 text-white px-3 py-1 rounded">登出</button>
+              <Link to="/cart" className="border px-2 py-1 rounded">購物車</Link>
             </>
           )}
         </div>
