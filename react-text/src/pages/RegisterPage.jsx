@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { register, resendVerification } from '../api/userApi';
 
 function RegisterPage() {
@@ -55,13 +56,20 @@ function RegisterPage() {
         <button type="submit" disabled={loading} style={{ width: '100%', padding: '10px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px', fontWeight: 'bold' }}>
           {loading ? '處理中...' : '註冊'}
         </button>
-      </form>
-      {showResend && (
-          <button onClick={handleResend}>
-            👉 沒收到？點此重新寄送驗證信
-          </button>
-      )}
+        {showResend && (
+            <button onClick={handleResend}>
+              👉 沒收到？點此重新寄送驗證信
+            </button>
+        )}
 
+        {/* 返回登入按鈕 */}
+        <div className="flex justify-between text-sm">
+          <Link to="/login" className="text-blue-500 hover:underline">返回登入頁面</Link>
+        </div>
+
+      </form>
+      
+      
       {message && <p style={{ color: 'green', fontWeight: 'bold' }}>{message}</p>}
       {error && <p style={{ color: 'red', fontWeight: 'bold' }}>{error}</p>}
       

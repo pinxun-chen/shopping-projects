@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navigate, useNavigate, Link } from 'react-router-dom';
 import { login } from '../api/userApi';
 
@@ -8,13 +8,13 @@ function LoginPage({ onLogin, loggedIn  }) {
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   const msg = localStorage.getItem("verifyMessage");
-  //   if (msg) {
-  //     setMessage(msg);
-  //     localStorage.removeItem("verifyMessage");
-  //   }
-  // }, []);
+  useEffect(() => {
+  const msg = localStorage.getItem('verifyMessage');
+    if (msg) {
+      setMessage(msg);             // 設定訊息
+      localStorage.removeItem('verifyMessage'); // 清除避免下次還顯示
+    }
+  }, []);
 
   const handleChange = e => {
     const { name, value } = e.target;
@@ -36,26 +36,24 @@ function LoginPage({ onLogin, loggedIn  }) {
     return <Navigate to="/" replace />;
   }
   return (
-    <div className="min-h-screen flex items-center justify-center bg-cover bg-center">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white/80 backdrop-blur-md p-8 rounded-lg shadow-lg w-96"
-      >
-        <h2 className="text-2xl font-bold mb-4 text-center text-blue-600">會員登入</h2>
+    <div style={{ maxWidth: '400px', margin: '4rem auto', padding: '2rem', border: '1px solid #ccc', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', fontFamily: 'Arial' }}>
+      <h2 className="text-2xl font-bold mb-4 text-center text-blue-600">會員登入</h2>
+      
+      <form onSubmit={handleSubmit}>
         {message && <p className="text-green-600 font-semibold mb-2">{message}</p>}
         {error && <p className="text-red-500 font-semibold mb-2">{error}</p>}
 
-        <label className="font-semibold">使用者名稱</label>
+        <label style={{ fontWeight: 'bold' }}>使用者名稱</label><br />
         <input
           name="username"
           onChange={handleChange}
           value={form.username}
           placeholder="帳號"
           required
-          className="w-full p-2 mb-3 border rounded"
-        />
+          style={{ width: '100%', padding: '8px', marginBottom: '1rem' }}
+        /><br />
 
-        <label className="font-semibold">密碼</label>
+        <label style={{ fontWeight: 'bold' }}>密碼</label><br />
         <input
           name="password"
           type="password"
@@ -63,13 +61,11 @@ function LoginPage({ onLogin, loggedIn  }) {
           value={form.password}
           placeholder="密碼"
           required
-          className="w-full p-2 mb-4 border rounded"
-        />
+          style={{ width: '100%', padding: '8px', marginBottom: '1rem' }} /><br />
 
         <button
           type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded mb-3"
-        >
+          style={{ width: '100%', padding: '10px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px', fontWeight: 'bold' }}>
           登入
         </button>
 

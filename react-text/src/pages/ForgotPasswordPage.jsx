@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { forgotPassword } from '../api/userApi';
 
 function ForgotPasswordPage() {
@@ -45,6 +46,10 @@ function ForgotPasswordPage() {
         <button type="submit" disabled={loading} style={{ width: '100%', padding: '10px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px', fontWeight: 'bold' }}>
           {loading ? '發送中...' : '寄送重設密碼連結'}
         </button>
+        {/* 返回登入按鈕 */}
+        <div className="flex justify-between text-sm">
+          <Link to="/login" className="text-blue-500 hover:underline">返回登入頁面</Link>
+        </div>
       </form>
     </div>
   );

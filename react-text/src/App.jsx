@@ -10,13 +10,8 @@ import ResetPasswordPage from './pages/ResetPasswordPage';
 import ChangePasswordPage from './pages/ChangePasswordPage';
 import UserProfilePage from './pages/UserProfilePage';
 import VerifyPage from './pages/VerifyPage';
-
-// 新增首頁與導覽列
-const HomePage = () => (
-  <div>
-    <img src="/assets/banner.jpg" alt="主視覺" className="w-full object-cover" />
-  </div>
-);
+import HomePage from './pages/HomePage';
+import ProductListPage from './pages/ProductListPage';
 
 const ProductPage = () => <div className="p-4">所有商品</div>;
 const CategoryPage = () => <div className="p-4">商品分類</div>;
@@ -58,12 +53,12 @@ function App() {
       {/* 導覽列 */}
       <nav className="bg-white border-b p-4 flex justify-between items-center shadow-sm">
         <div className="text-xl font-bold">
-          <Link to="/">CHRONIC</Link>
+          <Link to="/">購物網站</Link>
         </div>
         <div className="space-x-4">
-          <Link to="/products" className="hover:underline">NEW ARRIVALS</Link>
-          <Link to="/categories" className="hover:underline">SS25</Link>
-          <Link to="/categories" className="hover:underline">AW24</Link>
+          <Link to="/products" className="hover:underline">所有商品</Link>
+          <Link to="/categories" className="hover:underline">商品分類</Link>
+          <Link to="/categories" className="hover:underline">歷史訂單</Link>
         </div>
         <div className="space-x-2">
           {!loggedIn && (
@@ -106,7 +101,7 @@ function App() {
           <Route path="/verify" element={<VerifyPage />} />
 
           {/* 登入後受保護頁面 */}
-          <Route path="/products" element={<ProductPage />} />
+          <Route path="/products" element={<ProductListPage />} />
           <Route path="/categories" element={<CategoryPage />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/profile" element={<ProtectedRoute loggedIn={loggedIn}><UserProfilePage /></ProtectedRoute>} />
