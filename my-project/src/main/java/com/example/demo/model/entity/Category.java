@@ -3,6 +3,8 @@ package com.example.demo.model.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,5 +32,6 @@ public class Category {
 
     // 雙向關聯（可選）
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-    private List<Product> products = new ArrayList<>();
+    @JsonIgnore
+    private List<Product> products ;
 }

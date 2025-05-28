@@ -19,7 +19,7 @@ import com.example.demo.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/categories")
+@RequestMapping("/api/category")
 @RequiredArgsConstructor
 public class CategoryController {
 	

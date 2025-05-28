@@ -6,8 +6,11 @@ import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.model.dto.CategoryDto;
 import com.example.demo.model.dto.ProductDto;
+import com.example.demo.model.entity.Category;
 import com.example.demo.model.entity.Product;
+import com.example.demo.repository.CategoryRepository;
 import com.example.demo.repository.ProductRepository;
 import com.example.demo.service.ProductService;
 
@@ -18,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
     private final ModelMapper modelMapper;
 
     @Override
@@ -48,5 +52,16 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void delete(Integer id) {
         productRepository.deleteById(id);
+    }
+    
+    @Override
+    public List<CategoryDto> getAllCategories() {
+        List<Category> categoryList = categoryRepository.findAll();
+        return categoryList.stream().map(category -> {
+            CategoryDto dto = new CategoryDto();
+            dto.setId(category.getId());
+            dto.setName(category.getName());
+            return dto;
+        }).collect(Collectors.toList());
     }
 }

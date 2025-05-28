@@ -20,7 +20,7 @@ import com.example.demo.service.ProductService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/products")
+@RequestMapping("/api/products")
 @RequiredArgsConstructor
 public class ProductController {
 
@@ -33,7 +33,7 @@ public class ProductController {
         String message = products.isEmpty() ? "查無商品資料" : "查詢成功";
         return ResponseEntity.ok(ApiResponse.success(message, products));
     }
-
+    
     // 根據分類 ID 查詢商品
     @GetMapping("/category/{categoryId}")
     public ResponseEntity<ApiResponse<List<ProductDto>>> getByCategory(@PathVariable Integer categoryId) {
