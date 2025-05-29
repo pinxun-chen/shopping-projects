@@ -41,33 +41,39 @@ const ProductListPage = () => {
 
   // 加入購物車
   const handleAddToCart = async (productId) => {
-    const userId = localStorage.getItem("userId");
-    if (!userId) {
-      alert("請先登入才能加入購物車");
-      return;
-    }
-
     try {
       const res = await fetch('http://localhost:8082/api/cart/add', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // ✅ 重要：傳送 Session
         body: JSON.stringify({
-          userId: Number(userId),
           productId: productId,
           quantity: 1
         })
       });
 
-      const result = await res.json();
-      if (res.ok) {
-        alert(result.message);
-      } else {
-        alert(`加入失敗: ${result.message}`);
+      // ✅ ❗先處理未登入（401）情況
+      if (res.status === 401) {
+        alert("請先登入才能加入購物車！");
+        return;
       }
+
+      // ✅ ❗再確認是否其他非成功狀態，避免 JSON 解析錯誤
+      if (!res.ok) {
+        const text = await res.text(); // 嘗試讀出錯誤文字
+        alert("加入失敗: " + (text || "未知錯誤"));
+        return;
+      }
+
+      // ✅ 到這裡才安全地解析 JSON
+      const result = await res.json();
+      alert(result.message || "已加入購物車");
+
     } catch (err) {
-      alert('發生錯誤: ' + err.message);
+      alert("發生錯誤: " + err.message);
     }
   };
+
 
   // 搜尋關鍵字過濾
   const filteredProducts = products.filter(product =>
@@ -101,7 +107,7 @@ const ProductListPage = () => {
       </div>
 
       {/* 商品列表 */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {filteredProducts.map(product => (
           <div key={product.id} className="border rounded-lg shadow p-4 flex flex-col hover:shadow-lg transition h-96">
                 <img
