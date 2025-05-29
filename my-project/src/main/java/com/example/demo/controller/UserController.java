@@ -128,17 +128,28 @@ public class UserController {
     }
     
     @PostMapping("/login")
-	public ResponseEntity<ApiResponse<Void>> login(@RequestParam String username, @RequestParam String password, HttpSession session) {
-	    try {
-	        UserCert cert = certService.getCert(username, password);
-	        session.setAttribute("userCert", cert);
-	        return ResponseEntity.ok(ApiResponse.success("登入成功", null));
-	    } catch (CertException e) {
-	        return ResponseEntity
-	                .status(HttpStatus.UNAUTHORIZED)
-	                .body(ApiResponse.error(401, "登入失敗: " + e.getMessage()));
-	    }
-	}
+    public ResponseEntity<ApiResponse<UserDto>> login(
+            @RequestParam String username,
+            @RequestParam String password,
+            HttpSession session) {
+        try {
+            UserCert cert = certService.getCert(username, password);
+            session.setAttribute("userCert", cert);
+
+            // 將 UserCert 轉成 UserDto（給前端用）
+            UserDto dto = new UserDto();
+            dto.setUserId(cert.getUserId());
+            dto.setUsername(cert.getUsername());
+            dto.setRole(cert.getRole());
+
+            return ResponseEntity.ok(ApiResponse.success("登入成功", dto));
+        } catch (CertException e) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error(401, "登入失敗: " + e.getMessage()));
+        }
+    }
+
 	
 	@GetMapping("/logout")
 	public ResponseEntity<ApiResponse<Void>> logout(HttpSession session) {

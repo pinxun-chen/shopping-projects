@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.model.dto.CartAddRequest;
 import com.example.demo.model.dto.CartItemDto;
 import com.example.demo.model.dto.UpdateCartItemRequestDto;
 import com.example.demo.response.ApiResponse;
@@ -20,6 +22,7 @@ import com.example.demo.service.CartService;
 
 import lombok.RequiredArgsConstructor;
 
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RestController
 @RequestMapping("/api/cart")
 @RequiredArgsConstructor
@@ -37,14 +40,11 @@ public class CartController {
 
     // 加入商品至購物車
     @PostMapping("/add")
-    public ResponseEntity<ApiResponse<Void>> addToCart(
-            @RequestParam Integer userId,
-            @RequestParam Integer productId,
-            @RequestParam Integer quantity
-    ) {
-        cartService.addToCart(userId, productId, quantity);
+    public ResponseEntity<ApiResponse<Void>> addToCart(@RequestBody CartAddRequest request) {
+        cartService.addToCart(request.getUserId(), request.getProductId(), request.getQuantity());
         return ResponseEntity.ok(ApiResponse.success("加入成功", null));
     }
+
 
     // 更新購物車項目的商品數量
     @PutMapping("/{cartItemId}")
