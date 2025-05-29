@@ -25,7 +25,7 @@ function LoginPage({ onLogin, loggedIn  }) {
     e.preventDefault();
     const result = await login(form.username, form.password);
 
-    if (result.status === 200 && result.data) {
+    if (result.status === 200 ) {
       // 存入 userId
       localStorage.setItem("userId", result.data.userId);
       localStorage.setItem("loggedIn", "true");

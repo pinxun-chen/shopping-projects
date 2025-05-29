@@ -2,25 +2,48 @@ import React, { useEffect, useState } from 'react';
 
 const CartPage = ({ userId }) => {
   const [cartItems, setCartItems] = useState([]);
+  const [loggedIn, setLoggedIn] = useState(true);
+
   const API_URL = `http://localhost:8082/api/cart`;
 
   // 讀取購物車資料
   const fetchCart = async () => {
-    const uid = localStorage.getItem("userId");
-
-    if (!uid) {
-      alert("請先登入後再查看購物車");
-      return;
-    }
-
+    const uid = localStorage.getItem("userId"); 
     try {
-      const res = await fetch(`${API_URL}/${uid}`);
+      const res = await fetch(`${API_URL}/${uid}`,{
+        method: 'GET',
+        credentials: 'include' 
+      });
       const result = await res.json();
       setCartItems(result.data || []);
     } catch (err) {
       console.error("購物車載入失敗:", err);
     }
   };
+
+  useEffect(() => {
+    const uid = localStorage.getItem("userId");
+    if (!uid) {
+      setLoggedIn(false); // 控制頁面顯示提示訊息
+      return;
+    }
+    setLoggedIn(true); // 安全保險
+    fetchCart();
+  }, []);
+
+  if (!loggedIn) {
+    return (
+      <div className="p-10 text-center">
+        <p className="text-red-500 font-bold text-lg mb-4">🚫 請先登入才能查看購物車內容！</p>
+        <a
+          href="/login"
+          className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          前往登入
+        </a>
+      </div>
+    );
+  }
 
   // 更新購物車數量
   const updateQuantity = async (cartItemId, quantity) => {
@@ -37,12 +60,7 @@ const CartPage = ({ userId }) => {
     await fetch(`${API_URL}/${cartItemId}`, { method: 'DELETE' });
     fetchCart();
   };
-
-  useEffect(() => {
-    console.log("目前登入 userId =", userId);
-    fetchCart();
-  }, []);
-
+  
   const total = cartItems.reduce((sum, item) => sum + item.subtotal, 0);
 
   return (
