@@ -10,4 +10,5 @@ public class CartItemDto {
     private Integer quantity;
     private Integer unitPrice;
     private Integer subtotal;
+    private String imageUrl;
 }

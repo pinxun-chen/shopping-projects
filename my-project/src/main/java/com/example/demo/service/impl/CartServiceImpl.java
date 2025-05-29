@@ -50,6 +50,7 @@ public class CartServiceImpl implements CartService {
             dto.setQuantity(item.getQuantity());
             dto.setUnitPrice(item.getProduct().getPrice());
             dto.setSubtotal(item.getQuantity() * item.getProduct().getPrice());
+            dto.setImageUrl(item.getProduct().getImageUrl());
             return dto;
         }).collect(Collectors.toList());
     }
