@@ -53,6 +53,11 @@ const CartPage = ({ userId }) => {
           key={item.id}
           className="bg-white border rounded-lg shadow-md p-4 mb-4 flex flex-col sm:flex-row sm:items-center justify-between transition hover:shadow-lg"
         >
+          <img
+            src={item.imageUrl || "/assets/no-image.png"}
+            alt={item.productName}
+            className="w-32 h-32 object-cover rounded"
+          />
           <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full">
             <div className="text-sm sm:text-base">
               <p><span className="font-semibold">商品名稱：</span>{item.productName}</p>
