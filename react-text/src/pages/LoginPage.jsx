@@ -25,7 +25,10 @@ function LoginPage({ onLogin, loggedIn  }) {
     e.preventDefault();
     const result = await login(form.username, form.password);
 
-    if (result.status === 200) {
+    if (result.status === 200 && result.data) {
+      // 存入 userId
+      localStorage.setItem("userId", result.data.userId);
+      localStorage.setItem("loggedIn", "true");
       onLogin(); // 會跳轉
     } else {
       setError(result.message || '登入失敗');

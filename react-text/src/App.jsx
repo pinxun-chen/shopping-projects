@@ -12,9 +12,10 @@ import UserProfilePage from './pages/UserProfilePage';
 import VerifyPage from './pages/VerifyPage';
 import HomePage from './pages/HomePage';
 import ProductListPage from './pages/ProductListPage';
+import CartPage from './pages/CartPage';
+import OrderListPage from './pages/OrderListPage';
 
 const CategoryPage = () => <div className="p-4">商品分類</div>;
-const CartPage = () => <div className="p-4">購物車</div>;
 
 import { logout, checkLogin } from './api/userApi';
 
@@ -57,7 +58,7 @@ function App() {
         <div className="space-x-4">
           <Link to="/products" className="hover:underline">所有商品</Link>
           <Link to="/categories" className="hover:underline">商品分類</Link>
-          <Link to="/categories" className="hover:underline">歷史訂單</Link>
+          <Link to="/orders" className="hover:underline">歷史訂單</Link>
         </div>
         <div className="space-x-2">
           {!loggedIn && (
@@ -103,6 +104,7 @@ function App() {
           <Route path="/products" element={<ProductListPage />} />
           <Route path="/categories" element={<CategoryPage />} />
           <Route path="/cart" element={<CartPage />} />
+          <Route path="/orders" element={<OrderListPage />} />
           <Route path="/profile" element={<ProtectedRoute loggedIn={loggedIn}><UserProfilePage /></ProtectedRoute>} />
           <Route path="/change" element={<ProtectedRoute loggedIn={loggedIn}><ChangePasswordPage /></ProtectedRoute>} />
         </Routes>

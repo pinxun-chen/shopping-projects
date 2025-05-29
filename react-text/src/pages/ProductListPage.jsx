@@ -39,10 +39,34 @@ const ProductListPage = () => {
       .catch(err => console.error('取得商品錯誤', err));
   }, [selectedCategoryId]);
 
-  // 加入購物車（可接後端）
-  const handleAddToCart = (productId) => {
-    console.log('加入購物車：', productId);
-    // TODO: 呼叫 /api/cart 加入購物車
+  // 加入購物車
+  const handleAddToCart = async (productId) => {
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      alert("請先登入才能加入購物車");
+      return;
+    }
+
+    try {
+      const res = await fetch('http://localhost:8082/api/cart/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: Number(userId),
+          productId: productId,
+          quantity: 1
+        })
+      });
+
+      const result = await res.json();
+      if (res.ok) {
+        alert(result.message);
+      } else {
+        alert(`加入失敗: ${result.message}`);
+      }
+    } catch (err) {
+      alert('發生錯誤: ' + err.message);
+    }
   };
 
   // 搜尋關鍵字過濾
@@ -79,7 +103,7 @@ const ProductListPage = () => {
       {/* 商品列表 */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {filteredProducts.map(product => (
-          <div className="border rounded-lg shadow p-4 flex flex-col hover:shadow-lg transition h-96">
+          <div key={product.id} className="border rounded-lg shadow p-4 flex flex-col hover:shadow-lg transition h-96">
                 <img
                     src={product.imageUrl || '/assets/no-image.png'}
                     alt={product.name}
