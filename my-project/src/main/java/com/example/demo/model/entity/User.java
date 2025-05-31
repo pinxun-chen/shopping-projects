@@ -39,7 +39,7 @@ public class User {
 	@Column(name = "active")
 	private Boolean active;
 	
-	@Column(name = "role")
+	@Column(name = "role", nullable = false)
 	private String role;
 	
 }

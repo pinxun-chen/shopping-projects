@@ -76,7 +76,7 @@ public class OrderServiceImpl implements OrderService {
         
         // 寄送 Email 通知
         if (user.getEmail() != null && !user.getEmail().isEmpty()) {
-            String subject = "🛒 訂單確認通知";
+            String subject = "訂單確認通知";
             String content = "<h3>您好，" + user.getUsername() + "</h3>"
                 + "<p>您的訂單已成功建立，感謝您的購買。</p>"
                 + "<ul>"
@@ -126,6 +126,7 @@ public class OrderServiceImpl implements OrderService {
                 oidto.setProductName(oi.getProduct().getName());
                 oidto.setQuantity(oi.getQuantity());
                 oidto.setPrice(oi.getPrice());
+                oidto.setImageUrl(oi.getProduct().getImageUrl());
                 return oidto;
             }).collect(Collectors.toList());
 

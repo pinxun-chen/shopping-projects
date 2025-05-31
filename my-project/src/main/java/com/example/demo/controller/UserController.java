@@ -189,8 +189,31 @@ public class UserController {
 	        return ResponseEntity.badRequest().body(ApiResponse.error(400, "使用者不存在或已啟用"));
 	    }
 	}
-
 	
+	// 查詢使用者角色
+	@GetMapping("/role")
+	public ResponseEntity<ApiResponse<String>> getUserRole(HttpSession session) {
+	    UserCert cert = (UserCert) session.getAttribute("userCert");
+	    if (cert == null) {
+	        return ResponseEntity.status(401).body(ApiResponse.error(401, "尚未登入"));
+	    }
+	    return ResponseEntity.ok(ApiResponse.success("角色查詢成功", cert.getRole()));
+	}
+
+	// 查詢目前登入的使用者資訊
+	@GetMapping("/me")
+	public ResponseEntity<ApiResponse<UserDto>> getCurrentUser(HttpSession session) {
+	    UserCert cert = (UserCert) session.getAttribute("userCert");
+	    if (cert == null) {
+	        return ResponseEntity.status(401).body(ApiResponse.error(401, "尚未登入"));
+	    }
+
+	    UserDto dto = new UserDto();
+	    dto.setUserId(cert.getUserId());
+	    dto.setUsername(cert.getUsername());
+	    dto.setRole(cert.getRole());
+	    return ResponseEntity.ok(ApiResponse.success("查詢成功", dto));
+	}
 	
 }
 
