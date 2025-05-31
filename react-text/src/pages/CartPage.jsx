@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const CartPage = ({ userId }) => {
+const CartPage = () => {
   const [cartItems, setCartItems] = useState([]);
-  const [loggedIn, setLoggedIn] = useState(true);
-
+  const navigate = useNavigate();
   const API_URL = `http://localhost:8082/api/cart`;
 
   // 讀取購物車資料
   const fetchCart = async () => {
     const uid = localStorage.getItem("userId"); 
+    if (!uid) {
+      console.warn("尚未登入，無法載入購物車");
+      return;
+    }
     try {
       const res = await fetch(`${API_URL}/${uid}`,{
         method: 'GET',
@@ -22,33 +26,14 @@ const CartPage = ({ userId }) => {
   };
 
   useEffect(() => {
-    const uid = localStorage.getItem("userId");
-    if (!uid) {
-      setLoggedIn(false); // 控制頁面顯示提示訊息
-      return;
-    }
-    setLoggedIn(true); // 安全保險
     fetchCart();
   }, []);
-
-  if (!loggedIn) {
-    return (
-      <div className="p-10 text-center">
-        <p className="text-red-500 font-bold text-lg mb-4">🚫 請先登入才能查看購物車內容！</p>
-        <a
-          href="/login"
-          className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          前往登入
-        </a>
-      </div>
-    );
-  }
 
   // 更新購物車數量
   const updateQuantity = async (cartItemId, quantity) => {
     await fetch(`${API_URL}/${cartItemId}`, {
       method: 'PUT',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ quantity }),
     });
@@ -57,31 +42,38 @@ const CartPage = ({ userId }) => {
 
   // 刪除項目
   const deleteItem = async (cartItemId) => {
-    await fetch(`${API_URL}/${cartItemId}`, { method: 'DELETE' });
+    await fetch(`${API_URL}/${cartItemId}`, { method: 'DELETE', credentials: 'include', });
     fetchCart();
   };
   
   const total = cartItems.reduce((sum, item) => sum + item.subtotal, 0);
 
+  const handleCheckoutClick = () => {
+    navigate('/checkout');
+  };
+
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">🛒 購物車</h2>
+    <div className="p-4 max-w-3xl mx-auto">
+      <h2 className="text-xl font-bold mb-4"> 購物車</h2>
       {cartItems.map((item) => (
         <div
           key={item.id}
-          className="bg-white border rounded-lg shadow-md p-4 mb-4 flex flex-col sm:flex-row sm:items-center justify-between transition hover:shadow-lg"
-        >
+          className="bg-white border rounded-lg shadow-md p-4 mb-4 flex flex-col sm:flex-row sm:items-center justify-between transition hover:shadow-lg w-full max-w-2xl mx-auto">
           <img
             src={item.imageUrl || "/assets/no-image.png"}
             alt={item.productName}
             className="w-32 h-32 object-cover rounded"
           />
           <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full">
-            <div className="text-sm sm:text-base">
-              <p><span className="font-semibold">商品名稱：</span>{item.productName}</p>
-              <p><span className="font-semibold">單價：</span>${item.unitPrice}</p>
-              <p className="flex items-center gap-1">
-                <span className="font-semibold">數量：</span>
+            <div className="grid grid-cols-2 gap-y-1 text-sm sm:text-base text-right ml-auto">
+              <span className="font-semibold">商品名稱：</span>
+              <span>{item.productName}</span>
+
+              <span className="font-semibold">單價：</span>
+              <span>${item.unitPrice}</span>
+
+              <span className="font-semibold">數量：</span>
+              <span className="flex justify-end gap-1">
                 <input
                   type="number"
                   min={1}
@@ -89,8 +81,10 @@ const CartPage = ({ userId }) => {
                   onChange={(e) => updateQuantity(item.id, Number(e.target.value))}
                   className="w-16 border rounded px-2 py-1"
                 />
-              </p>
-              <p><span className="font-semibold">小計：</span>${item.subtotal}</p>
+              </span>
+
+              <span className="font-semibold">小計：</span>
+              <span>${item.subtotal}</span>
             </div>
             <button
               onClick={() => deleteItem(item.id)}
@@ -103,7 +97,17 @@ const CartPage = ({ userId }) => {
       ))}
 
       <div className="mt-4 font-bold text-lg">總金額：${total}</div>
-    </div>
+      {cartItems.length > 0 && (
+        <div className="mt-6 text-right">
+              <button
+                onClick={handleCheckoutClick}
+                className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
+              >
+                前往結帳
+              </button>
+            </div>
+          )}
+        </div>
   );
 };
 

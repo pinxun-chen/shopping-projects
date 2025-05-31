@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Navigate, useNavigate, Link } from 'react-router-dom';
+import { Navigate, useNavigate, useLocation, Link } from 'react-router-dom';
 import { login } from '../api/userApi';
 
 function LoginPage({ onLogin, loggedIn  }) {
@@ -7,13 +7,13 @@ function LoginPage({ onLogin, loggedIn  }) {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
-
+  const location = useLocation();
   useEffect(() => {
-  const msg = localStorage.getItem('verifyMessage');
-    if (msg) {
-      setMessage(msg);             // 設定訊息
-      localStorage.removeItem('verifyMessage'); // 清除避免下次還顯示
-    }
+    const msg = localStorage.getItem('verifyMessage');
+      if (msg) {
+        setMessage(msg);             // 設定訊息
+        localStorage.removeItem('verifyMessage'); // 清除避免下次還顯示
+      }
   }, []);
 
   const handleChange = e => {

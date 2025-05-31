@@ -45,27 +45,29 @@ const ProductListPage = () => {
       const res = await fetch('http://localhost:8082/api/cart/add', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // ✅ 重要：傳送 Session
+        credentials: 'include', // 重要：傳送 Session
         body: JSON.stringify({
-          productId: productId,
-          quantity: 1
+          productId //: productId,
+          ,quantity: 1
         })
       });
 
-      // ✅ ❗先處理未登入（401）情況
       if (res.status === 401) {
         alert("請先登入才能加入購物車！");
         return;
       }
 
-      // ✅ ❗再確認是否其他非成功狀態，避免 JSON 解析錯誤
       if (!res.ok) {
-        const text = await res.text(); // 嘗試讀出錯誤文字
-        alert("加入失敗: " + (text || "未知錯誤"));
+        let text = "未知錯誤";
+        try {
+          text = await res.text(); // 這一行如果 response 是空的也會 throw
+        } catch (err) {
+          text = "伺服器錯誤（無錯誤訊息）";
+        }
+        alert("加入失敗: " + text);
         return;
       }
 
-      // ✅ 到這裡才安全地解析 JSON
       const result = await res.json();
       alert(result.message || "已加入購物車");
 

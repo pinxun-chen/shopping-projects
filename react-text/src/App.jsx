@@ -14,17 +14,10 @@ import HomePage from './pages/HomePage';
 import ProductListPage from './pages/ProductListPage';
 import CartPage from './pages/CartPage';
 import OrderListPage from './pages/OrderListPage';
-import CategoryPage from './pages/CategoryPage';
+import CheckoutPage from './pages/CheckoutPage';
+import ProtectedRoute from "./components/ProtectedRoute";
 
 import { logout, checkLogin } from './api/userApi';
-
-function ProtectedRoute({ loggedIn, children }) {
-  const location = useLocation();
-  if (!loggedIn) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
-  return children;
-}
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(() => {
@@ -100,11 +93,11 @@ function App() {
 
           {/* 登入後受保護頁面 */}
           <Route path="/products" element={<ProductListPage />} />
-          <Route path="/categories" element={<CategoryPage />} />
           <Route path="/cart" element={<ProtectedRoute loggedIn={loggedIn}> <CartPage /> </ProtectedRoute>} />
-          <Route path="/orders" element={<OrderListPage />} />
+          <Route path="/orders" element={<ProtectedRoute loggedIn={loggedIn}> <OrderListPage /> </ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute loggedIn={loggedIn}><UserProfilePage /></ProtectedRoute>} />
           <Route path="/change" element={<ProtectedRoute loggedIn={loggedIn}><ChangePasswordPage /></ProtectedRoute>} />
+          <Route path="/checkout" element={<ProtectedRoute loggedIn={loggedIn}><CheckoutPage /></ProtectedRoute>} />
         </Routes>
       </div>
     </Router>
