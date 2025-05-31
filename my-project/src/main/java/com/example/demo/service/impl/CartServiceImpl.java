@@ -1,6 +1,7 @@
 package com.example.demo.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -29,12 +30,22 @@ public class CartServiceImpl implements CartService {
         User user = userRepo.findById(userId).orElseThrow();
         Product product = productRepo.findById(productId).orElseThrow();
 
-        CartItem item = new CartItem();
-        item.setUser(user);
-        item.setProduct(product);
-        item.setQuantity(quantity);
+        // 查詢是否已有相同商品在購物車
+        Optional<CartItem> optionalItem = cartItemRepo.findByUserAndProduct(user, product);
 
-        cartItemRepo.save(item);
+        if (optionalItem.isPresent()) {
+            // 若已有商品，數量相加
+            CartItem existingItem = optionalItem.get();
+            existingItem.setQuantity(existingItem.getQuantity() + quantity);
+            cartItemRepo.save(existingItem);
+        } else {
+            // 否則新增
+            CartItem newItem = new CartItem();
+            newItem.setUser(user);
+            newItem.setProduct(product);
+            newItem.setQuantity(quantity);
+            cartItemRepo.save(newItem);
+        }
     }
 
     @Override

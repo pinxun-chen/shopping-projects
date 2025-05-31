@@ -26,6 +26,15 @@ public class Order {
     // 訂單總金額
     private Integer totalAmount;
 
+    // 付款方式（例如：信用卡、7-11）
+    private String paymentMethod;
+
+    // 收件人資訊
+    private String receiverName;
+    private String receiverPhone;
+    private String receiverAddress;
+    private String email; // 可選：寄送通知用
+
     // 訂單明細
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems;

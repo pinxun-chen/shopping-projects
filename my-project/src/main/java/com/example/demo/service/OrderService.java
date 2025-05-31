@@ -5,6 +5,7 @@ import java.util.List;
 import com.example.demo.model.dto.OrderDto;
 
 public interface OrderService {
-    OrderDto createOrder(Integer userId);
+    OrderDto createOrder(OrderDto orderDto);
     List<OrderDto> getOrders(Integer userId);
+    
 }
