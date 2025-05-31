@@ -17,6 +17,7 @@ const CheckoutPage = () => {
     cvv: '',
   });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false); // 控制是否顯示「結帳中」
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -53,6 +54,8 @@ const CheckoutPage = () => {
       return;
     }
 
+    setLoading(true); // 開始 loading
+
     try {
       const res = await fetch('http://localhost:8082/api/order/create', {
         method: 'POST',
@@ -64,7 +67,7 @@ const CheckoutPage = () => {
       const result = await res.json();
 
       if (res.status === 200) {
-        alert('✅ 訂單已建立，通知信已寄送至您的信箱');
+        alert('訂單已建立，通知信已寄送至您的信箱');
         navigate('/orders');
       } else {
         alert('訂單建立失敗：' + result.message);
@@ -77,7 +80,7 @@ const CheckoutPage = () => {
 
   return (
     <div className="max-w-md mx-auto p-6 bg-white shadow rounded">
-      <h2 className="text-xl font-bold mb-4">📦 收件資訊</h2>
+      <h2 className="text-xl font-bold mb-4"> 收件資訊</h2>
 
       {error && <p className="text-red-500 mb-2">{error}</p>}
 
@@ -112,7 +115,7 @@ const CheckoutPage = () => {
       </select>
 
       {/* 根據付款方式顯示對應欄位 */}
-      {form.paymentMethod === '711' && (
+      {form.paymentMethod === '7-11 貨到付款' && (
         <>
           <label className="block mb-1 font-semibold">7-11 門市名稱</label>
           <input name="storeName" value={form.storeName} onChange={handleChange}
@@ -124,7 +127,7 @@ const CheckoutPage = () => {
         </>
       )}
 
-      {form.paymentMethod === 'credit' && (
+      {form.paymentMethod === '宅配信用卡付款' && (
         <>
           <label className="block mb-1 font-semibold">信用卡卡號</label>
           <input name="cardNumber" value={form.cardNumber} onChange={handleChange}
@@ -140,12 +143,22 @@ const CheckoutPage = () => {
         </>
       )}
 
-      <button
-        onClick={handleCheckout}
-        className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-      >
-        🛒 確認結帳
-      </button>
+      <div className="flex justify-between">
+        <button
+          onClick={handleCheckout}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          disabled={loading}
+        >
+          {loading ? ' 結帳中...' : ' 確認結帳'}
+        </button>
+
+        <button
+          onClick={() => navigate('/cart')}
+          className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+        >
+           返回購物車
+        </button>
+      </div>
     </div>
   );
 };

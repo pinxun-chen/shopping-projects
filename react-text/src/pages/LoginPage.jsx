@@ -8,6 +8,7 @@ function LoginPage({ onLogin, loggedIn  }) {
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
+
   useEffect(() => {
     const msg = localStorage.getItem('verifyMessage');
       if (msg) {
@@ -19,25 +20,40 @@ function LoginPage({ onLogin, loggedIn  }) {
   const handleChange = e => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
+    setError('');
   };
 
   const handleSubmit = async e => {
     e.preventDefault();
     const result = await login(form.username, form.password);
 
-    if (result.status === 200 ) {
-      // 存入 userId
-      localStorage.setItem("userId", result.data.userId);
+    if (result.status === 200) {
+      const { userId, username, role } = result.data;
+
+      // 儲存登入資料
+      localStorage.setItem("userId", userId);
+      localStorage.setItem("username", username);
+      localStorage.setItem("role", role);
       localStorage.setItem("loggedIn", "true");
-      onLogin(); // 會跳轉
+
+      onLogin(); // 通知父層更新狀態
+
+      // 依角色跳轉
+      if (role === "ADMIN") {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
     } else {
       setError(result.message || '登入失敗');
     }
   };
+
   // 如果登入成功就立刻跳轉首頁
   if (loggedIn) {
     return <Navigate to="/" replace />;
   }
+  
   return (
     <div style={{ maxWidth: '400px', margin: '4rem auto', padding: '2rem', border: '1px solid #ccc', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', fontFamily: 'Arial' }}>
       <h2 className="text-2xl font-bold mb-4 text-center text-blue-600">會員登入</h2>

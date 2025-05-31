@@ -95,7 +95,6 @@ const CartPage = () => {
           </div>
         </div>
       ))}
-
       <div className="mt-4 font-bold text-lg">總金額：${total}</div>
       {cartItems.length > 0 && (
         <div className="mt-6 text-right">
@@ -108,6 +107,7 @@ const CartPage = () => {
             </div>
           )}
         </div>
+      
   );
 };
 
