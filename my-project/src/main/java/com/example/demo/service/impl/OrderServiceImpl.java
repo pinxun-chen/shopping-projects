@@ -134,5 +134,39 @@ public class OrderServiceImpl implements OrderService {
             return dto;
         }).collect(Collectors.toList());
     }
+    
+    // 管理者查詢所有訂單
+    @Override
+    public List<OrderDto> getAllOrders() {
+        return orderRepo.findAll().stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    // 將 Order 實體轉換成 OrderDto（不包含 items 的版本）
+    private OrderDto convertToDto(Order order) {
+        OrderDto dto = new OrderDto();
+        dto.setOrderId(order.getId());
+        dto.setUserId(order.getUser().getUserId());
+        dto.setOrderTime(order.getOrderTime());
+        dto.setTotalAmount(order.getTotalAmount());
+        dto.setReceiverName(order.getReceiverName());
+        dto.setReceiverPhone(order.getReceiverPhone());
+        dto.setReceiverAddress(order.getReceiverAddress());
+        dto.setPaymentMethod(order.getPaymentMethod());
+        dto.setEmail(order.getEmail());
+
+        // 商品明細（可選）
+        List<OrderItemDto> itemDtos = order.getOrderItems().stream().map(item -> {
+            OrderItemDto itemDto = new OrderItemDto();
+            itemDto.setProductName(item.getProduct().getName());
+            itemDto.setPrice(item.getPrice());
+            itemDto.setQuantity(item.getQuantity());
+            return itemDto;
+        }).collect(Collectors.toList());
+        dto.setItems(itemDtos);
+
+        return dto;
+    }
 }
 
