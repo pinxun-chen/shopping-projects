@@ -1,6 +1,7 @@
 package com.example.demo.service.impl;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,6 +36,8 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private EmailService emailService;
 
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+
     @Override
     @Transactional
     public OrderDto createOrder(OrderDto orderDto) {
@@ -48,7 +51,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = new Order();
         order.setUser(user);
         order.setOrderTime(LocalDateTime.now());
-        
+
         // 從前端接收資訊
         order.setReceiverName(orderDto.getReceiverName());
         order.setReceiverPhone(orderDto.getReceiverPhone());
@@ -73,7 +76,7 @@ public class OrderServiceImpl implements OrderService {
 
         orderRepo.save(order); // 連同明細一併存入
         cartRepo.deleteAll(cartItems); // 清空購物車
-        
+
         // 寄送 Email 通知
         if (user.getEmail() != null && !user.getEmail().isEmpty()) {
             String subject = "訂單確認通知";
@@ -82,7 +85,7 @@ public class OrderServiceImpl implements OrderService {
                 + "<ul>"
                 + "<li>訂單編號：<strong>" + order.getId() + "</strong></li>"
                 + "<li>總金額：<strong>$" + order.getTotalAmount() + "</strong></li>"
-                + "<li>建立時間：<strong>" + order.getOrderTime() + "</strong></li>"
+                + "<li>建立時間：<strong>" + order.getOrderTime().format(FORMATTER) + "</strong></li>"
                 + "</ul>"
                 + "<p>如有任何問題歡迎與我們聯繫。</p>";
             emailService.sendMail(user.getEmail(), subject, content);
@@ -92,6 +95,7 @@ public class OrderServiceImpl implements OrderService {
         OrderDto dto = new OrderDto();
         dto.setOrderId(order.getId());
         dto.setOrderTime(order.getOrderTime());
+        dto.setFormattedTime(order.getOrderTime().format(FORMATTER));
         dto.setTotalAmount(order.getTotalAmount());
         dto.setItems(orderItems.stream().map(oi -> {
             OrderItemDto oidto = new OrderItemDto();
@@ -113,6 +117,7 @@ public class OrderServiceImpl implements OrderService {
             OrderDto dto = new OrderDto();
             dto.setOrderId(order.getId());
             dto.setOrderTime(order.getOrderTime());
+            dto.setFormattedTime(order.getOrderTime().format(FORMATTER));
             dto.setTotalAmount(order.getTotalAmount());
             dto.setReceiverName(order.getReceiverName());
             dto.setReceiverPhone(order.getReceiverPhone());
@@ -134,7 +139,7 @@ public class OrderServiceImpl implements OrderService {
             return dto;
         }).collect(Collectors.toList());
     }
-    
+
     // 管理者查詢所有訂單
     @Override
     public List<OrderDto> getAllOrders() {
@@ -149,6 +154,7 @@ public class OrderServiceImpl implements OrderService {
         dto.setOrderId(order.getId());
         dto.setUserId(order.getUser().getUserId());
         dto.setOrderTime(order.getOrderTime());
+        dto.setFormattedTime(order.getOrderTime().format(FORMATTER));
         dto.setTotalAmount(order.getTotalAmount());
         dto.setReceiverName(order.getReceiverName());
         dto.setReceiverPhone(order.getReceiverPhone());
@@ -169,4 +175,3 @@ public class OrderServiceImpl implements OrderService {
         return dto;
     }
 }
-

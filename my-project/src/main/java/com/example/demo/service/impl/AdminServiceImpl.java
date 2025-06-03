@@ -15,6 +15,7 @@ import com.example.demo.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -83,14 +84,24 @@ public class AdminServiceImpl implements AdminService {
     }
     
     @Override
+    public boolean deleteUser(String username) {
+        return userRepo.findByUsername(username).map(user -> {
+            userRepo.delete(user);
+            return true;
+        }).orElse(false);
+    }
+    
+    @Override
     public List<OrderDto> getAllOrders() {
-        List<Order> orders = orderRepo.findAll(); // 需有 fetch orderItems + product
+        List<Order> orders = orderRepo.findAll();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 
         return orders.stream().map(order -> {
             OrderDto dto = new OrderDto();
             dto.setOrderId(order.getId());
             dto.setUserId(order.getUser().getUserId());
             dto.setOrderTime(order.getOrderTime());
+            dto.setFormattedTime(order.getOrderTime() != null ? order.getOrderTime().format(formatter) : "未知時間");
             dto.setTotalAmount(order.getTotalAmount());
             dto.setReceiverName(order.getReceiverName());
             dto.setReceiverPhone(order.getReceiverPhone());
@@ -103,6 +114,7 @@ public class AdminServiceImpl implements AdminService {
                 itemDto.setProductName(item.getProduct().getName());
                 itemDto.setQuantity(item.getQuantity());
                 itemDto.setPrice(item.getPrice());
+                itemDto.setImageUrl(item.getProduct().getImageUrl());
                 return itemDto;
             }).collect(Collectors.toList());
 
@@ -110,4 +122,13 @@ public class AdminServiceImpl implements AdminService {
             return dto;
         }).collect(Collectors.toList());
     }
+    
+    @Override
+    public boolean cancelOrder(Integer orderId) {
+        return orderRepo.findById(orderId).map(order -> {
+            orderRepo.delete(order);
+            return true;
+        }).orElse(false);
+    }
+
 }

@@ -13,7 +13,11 @@ public interface AdminService {
     
     List<User> getAllUsers();
     boolean updateUserRole(Integer userId, String newRole);
+    boolean deleteUser(String username);
     
     // 提供給管理者查詢所有訂單
     List<OrderDto> getAllOrders();
+    
+    // 提供給管理者刪除訂單
+    boolean cancelOrder(Integer orderId);
 }

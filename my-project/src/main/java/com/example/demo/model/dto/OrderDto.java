@@ -12,6 +12,7 @@ public class OrderDto {
     private Integer userId;               // 使用者 ID
     
     private LocalDateTime orderTime;      // 訂單時間
+    private String formattedTime;         // 時間格式化
     private Integer totalAmount;          // 總金額
 
     private String receiverName;          // 收件人姓名

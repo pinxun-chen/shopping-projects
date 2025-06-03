@@ -60,10 +60,37 @@ public class AdminController {
             return ResponseEntity.status(404).body(ApiResponse.error(404, "使用者不存在"));
         }
     }
+    
+    // 刪除使用者帳號
+    @DeleteMapping("/users/delete/{username}")
+    public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable String username, @SessionAttribute("userCert") Object cert) {
+        // 防止刪除自己帳號
+        if (cert instanceof com.example.demo.model.dto.UserCert userCert && userCert.getUsername().equals(username)) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(400, "不能刪除自己帳號"));
+        }
+
+        boolean result = adminService.deleteUser(username);
+        if (result) {
+            return ResponseEntity.ok(ApiResponse.success("帳號刪除成功", null));
+        } else {
+            return ResponseEntity.status(404).body(ApiResponse.error(404, "找不到該帳號"));
+        }
+    }
 
     // 查詢所有訂單
     @GetMapping("/orders")
     public ResponseEntity<ApiResponse<?>> getAllOrders() {
         return ResponseEntity.ok(ApiResponse.success("查詢成功", adminService.getAllOrders()));
+    }
+    
+    // 刪除訂單
+    @DeleteMapping("/orders/{orderId}")
+    public ResponseEntity<ApiResponse<Void>> cancelOrder(@PathVariable Integer orderId) {
+        boolean result = adminService.cancelOrder(orderId);
+        if (result) {
+            return ResponseEntity.ok(ApiResponse.success("訂單已取消", null));
+        } else {
+            return ResponseEntity.status(404).body(ApiResponse.error(404, "查無此訂單"));
+        }
     }
 }
