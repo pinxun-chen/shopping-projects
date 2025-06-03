@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
 const UserAdminPage = () => {
   const [users, setUsers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentUsername, setCurrentUsername] = useState("");
 
   const fetchUsers = async () => {
     try {
@@ -10,16 +12,41 @@ const UserAdminPage = () => {
       if (data.status === 200) {
         setUsers(data.data);
       } else {
-        alert(data.message || "載入會員資料失敗");
+        alert(data.message || "載入使用者失敗");
       }
     } catch (err) {
       alert("錯誤：" + err.message);
     }
   };
 
+  const fetchCurrentUser = async () => {
+    const userId = localStorage.getItem("userId");
+    if (!userId) return;
+
+    try {
+      const res = await fetch(`/users/${userId}`, { credentials: "include" });
+      const contentType = res.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const result = await res.json();
+        if (result.status === 200) {
+          setCurrentUsername(result.data.username);
+        }
+      } else {
+        console.error("伺服器未回傳 JSON 格式", await res.text());
+      }
+    } catch (err) {
+      console.error("取得登入使用者失敗", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+    fetchCurrentUser();
+  }, []);
+
   const toggleRole = async (userId, currentRole) => {
     const newRole = currentRole === "USER" ? "ADMIN" : "USER";
-    const confirmed = window.confirm(`確定將此用戶改為 ${newRole} 嗎？`);
+    const confirmed = window.confirm(`確定要將此使用者設為 ${newRole} 嗎？`);
     if (!confirmed) return;
 
     try {
@@ -29,47 +56,63 @@ const UserAdminPage = () => {
       });
       const result = await res.json();
       if (res.status === 200) {
-        alert("角色已更新");
+        alert("角色更新成功");
         fetchUsers();
       } else {
-        alert(result.message || "角色更新失敗");
+        alert(result.message || "更新失敗");
       }
     } catch (err) {
-      alert("錯誤：" + err.message);
+      alert("角色更新錯誤：" + err.message);
     }
   };
 
-  const deleteUser = async (userId) => {
-    const confirm = window.confirm("確定要刪除此帳號嗎？此操作不可復原！");
+  const deleteUser = async (username) => {
+    if (username === currentUsername) {
+      alert("⚠️ 不能刪除自己帳號！");
+      return;
+    }
+
+    const confirm = window.confirm(`確定要刪除使用者「${username}」？此操作不可恢復。`);
     if (!confirm) return;
 
     try {
-      const res = await fetch(`/api/admin/users/delete/${userId}`, {
+      const res = await fetch(`/api/admin/users/delete/${username}`, {
         method: "DELETE",
         credentials: "include",
       });
       const result = await res.json();
       if (res.status === 200) {
-        alert("帳號已刪除");
+        alert("帳號已成功刪除");
         fetchUsers();
       } else {
         alert(result.message || "刪除失敗");
       }
     } catch (err) {
-      alert("錯誤：" + err.message);
+      alert("刪除錯誤：" + err.message);
     }
   };
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  const filteredUsers = users.filter((u) =>
+    `${u.username} ${u.email}`.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">會員管理</h2>
+
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="搜尋帳號或 Email"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="border px-3 py-2 rounded w-full max-w-sm"
+        />
+      </div>
+
       <table className="min-w-full border">
-        <thead>
-          <tr className="bg-gray-100">
+        <thead className="bg-gray-100">
+          <tr>
             <th className="border px-4 py-2">帳號</th>
             <th className="border px-4 py-2">Email</th>
             <th className="border px-4 py-2">角色</th>
@@ -78,7 +121,7 @@ const UserAdminPage = () => {
           </tr>
         </thead>
         <tbody>
-          {users.map(user => (
+          {filteredUsers.map((user) => (
             <tr key={user.userId}>
               <td className="border px-4 py-2">{user.username}</td>
               <td className="border px-4 py-2">{user.email}</td>
@@ -89,13 +132,13 @@ const UserAdminPage = () => {
                   onClick={() => toggleRole(user.userId, user.role)}
                   className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
                 >
-                  {user.role === "USER" ? "升為管理者" : "改為一般用戶"}
+                  {user.role === "USER" ? "升為管理者" : "降為用戶"}
                 </button>
                 <button
                   onClick={() => deleteUser(user.username)}
                   className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
                 >
-                  刪除帳號
+                  刪除
                 </button>
               </td>
             </tr>
@@ -107,4 +150,3 @@ const UserAdminPage = () => {
 };
 
 export default UserAdminPage;
-
