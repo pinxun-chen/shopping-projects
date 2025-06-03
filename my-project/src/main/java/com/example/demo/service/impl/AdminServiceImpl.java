@@ -7,16 +7,20 @@ import com.example.demo.model.entity.Category;
 import com.example.demo.model.entity.Order;
 import com.example.demo.model.entity.Product;
 import com.example.demo.model.entity.User;
+import com.example.demo.repository.CartItemRepository;
 import com.example.demo.repository.CategoryRepository;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.ProductRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.AdminService;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,6 +31,7 @@ public class AdminServiceImpl implements AdminService {
     private final CategoryRepository categoryRepo;
     private final OrderRepository orderRepo;
     private final UserRepository userRepo;
+    private final CartItemRepository cartItemRepo;
 
     @Override
     public List<ProductDto> getAllProducts() {
@@ -84,13 +89,26 @@ public class AdminServiceImpl implements AdminService {
     }
     
     @Override
+    @Transactional
     public boolean deleteUser(String username) {
-        return userRepo.findByUsername(username).map(user -> {
-            userRepo.delete(user);
-            return true;
-        }).orElse(false);
-    }
-    
+        Optional<User> userOpt = userRepo.findByUsername(username);
+        if (userOpt.isEmpty()) return false;
+
+        User user = userOpt.get();
+
+        // 1. 先刪除該使用者的購物車項目
+        cartItemRepo.deleteByUser(user); // 確保 cartItemRepo 有此方法
+
+        // 2. 再刪除該使用者的訂單（若訂單含 orderItems，需設定 Cascade）
+        List<Order> orders = orderRepo.findByUser(user);
+        for (Order order : orders) {
+            orderRepo.delete(order); // 若 Order 有 CascadeType.ALL，則 orderItems 也會刪掉
+        }
+
+        // 3. 最後刪除使用者本身
+        userRepo.delete(user);
+        return true;
+    }    
     @Override
     public List<OrderDto> getAllOrders() {
         List<Order> orders = orderRepo.findAll();

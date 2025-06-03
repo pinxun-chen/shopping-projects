@@ -4,6 +4,8 @@ import com.example.demo.model.dto.ProductDto;
 import com.example.demo.model.entity.User;
 import com.example.demo.response.ApiResponse;
 import com.example.demo.service.AdminService;
+
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -63,19 +65,35 @@ public class AdminController {
     
     // 刪除使用者帳號
     @DeleteMapping("/users/delete/{username}")
-    public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable String username, @SessionAttribute("userCert") Object cert) {
+    public ResponseEntity<ApiResponse<Void>> deleteUser(
+            @PathVariable String username,
+            HttpSession session) {
+
+    	// 取得登入者的認證資訊
+        Object cert = session.getAttribute("userCert");
+        
+        // Debug 輸出 session 內容與欲刪除的帳號
+        System.out.println("===== 刪除帳號請求 =====");
+        System.out.println("Session userCert: " + cert);
+        System.out.println("欲刪除帳號: " + username);
+
         // 防止刪除自己帳號
-        if (cert instanceof com.example.demo.model.dto.UserCert userCert && userCert.getUsername().equals(username)) {
-            return ResponseEntity.badRequest().body(ApiResponse.error(400, "不能刪除自己帳號"));
+        if (cert instanceof com.example.demo.model.dto.UserCert userCert &&
+            userCert.getUsername().equals(username)) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error(400, "不能刪除自己帳號"));
         }
 
         boolean result = adminService.deleteUser(username);
         if (result) {
-            return ResponseEntity.ok(ApiResponse.success("帳號刪除成功", null));
+            return ResponseEntity.ok(ApiResponse.success("帳號與訂單已成功刪除", null));
         } else {
-            return ResponseEntity.status(404).body(ApiResponse.error(404, "找不到該帳號"));
+            return ResponseEntity.status(404)
+                    .body(ApiResponse.error(404, "找不到該帳號"));
         }
     }
+
+
 
     // 查詢所有訂單
     @GetMapping("/orders")

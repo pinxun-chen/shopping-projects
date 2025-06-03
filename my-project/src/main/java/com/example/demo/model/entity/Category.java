@@ -1,6 +1,5 @@
 package com.example.demo.model.entity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;

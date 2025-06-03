@@ -12,4 +12,5 @@ import com.example.demo.model.entity.User;
 public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
     List<CartItem> findByUser(User user);
     Optional<CartItem> findByUserAndProduct(User user, Product product);
+    void deleteByUser(User user);
 }
