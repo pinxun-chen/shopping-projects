@@ -68,7 +68,7 @@ const UserAdminPage = () => {
 
   const deleteUser = async (username) => {
     if (username === currentUsername) {
-      alert("⚠️ 不能刪除自己帳號！");
+      alert(" 不能刪除自己帳號！");
       return;
     }
 
@@ -113,7 +113,8 @@ const UserAdminPage = () => {
       <table className="min-w-full border">
         <thead className="bg-gray-100">
           <tr>
-            <th className="border px-4 py-2">帳號</th>
+            <th className="border px-4 py-2">ID</th>
+            <th className="border px-4 py-2">名稱</th>
             <th className="border px-4 py-2">Email</th>
             <th className="border px-4 py-2">角色</th>
             <th className="border px-4 py-2">啟用</th>
@@ -123,10 +124,11 @@ const UserAdminPage = () => {
         <tbody>
           {filteredUsers.map((user) => (
             <tr key={user.userId}>
+              <td className="border px-4 py-2">{user.userId}</td>
               <td className="border px-4 py-2">{user.username}</td>
               <td className="border px-4 py-2">{user.email}</td>
               <td className="border px-4 py-2">{user.role}</td>
-              <td className="border px-4 py-2">{user.active ? "✅" : "❌"}</td>
+              <td className="border px-4 py-2">{user.active ? "True" : "False"}</td>
               <td className="border px-4 py-2 space-x-2">
                 <button
                   onClick={() => toggleRole(user.userId, user.role)}
