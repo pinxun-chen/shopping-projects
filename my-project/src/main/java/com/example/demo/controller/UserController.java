@@ -40,7 +40,6 @@ public class UserController {
         }
     }
 
-
     // 註冊
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<Void>> register(@RequestBody RegisterRequestDto request) {
