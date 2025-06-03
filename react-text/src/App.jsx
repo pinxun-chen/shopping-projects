@@ -19,6 +19,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import ProductAdminPage from './pages/admin/ProductAdminPage';
 import OrderAdminPage from './pages/admin/OrderAdminPage';
 import UserAdminPage from './pages/admin/UserAdminPage';
+import OrderDetailPage from './pages/admin/OrderDetailPage';
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import { logout, checkLogin } from './api/userApi';
@@ -136,6 +137,11 @@ function App() {
           <Route path="/admin/orders" element={
             <ProtectedRoute loggedIn={loggedIn} requiredRole="ADMIN">
               <OrderAdminPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/orders/:orderId" element={
+            <ProtectedRoute loggedIn={loggedIn} requiredRole="ADMIN">
+              <OrderDetailPage />
             </ProtectedRoute>
           } />
           <Route path="/admin/users" element={

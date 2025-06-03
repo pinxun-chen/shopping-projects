@@ -45,12 +45,6 @@ const OrderListPage = () => {
     );
   }
 
-  const formatDate = (dateString) => {
-    if (!dateString) return '未知時間';
-    const date = new Date(dateString);
-    return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
-  };
-
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">訂單列表</h2>
@@ -65,7 +59,7 @@ const OrderListPage = () => {
           <div className="flex-1">
             <p><strong>訂單編號：</strong>{order.orderId}</p>
             <p><strong>總金額：</strong>${order.totalAmount}</p>
-            <p><strong>建立時間：</strong>{formatDate(order.orderTime)}</p>
+            <p><strong>建立時間：</strong>{order.formattedTime}</p>
             <p><strong>付款方式：</strong>{order.paymentMethod || '未提供'}</p>
             <p><strong>收件人姓名：</strong>{order.receiverName || '未填寫'}</p>
             <p><strong>收件人電話：</strong>{order.receiverPhone || '未填寫'}</p>
