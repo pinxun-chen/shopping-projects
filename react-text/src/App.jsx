@@ -17,6 +17,8 @@ import OrderListPage from './pages/OrderListPage';
 import CheckoutPage from './pages/CheckoutPage';
 import AdminDashboard from './pages/AdminDashboard';
 import ProductAdminPage from './pages/admin/ProductAdminPage';
+import ProductFormPage from './pages/admin/ProductFormPage';
+import ProductDetailPage from './pages/admin/ProductDetailPage';
 import OrderAdminPage from './pages/admin/OrderAdminPage';
 import UserAdminPage from './pages/admin/UserAdminPage';
 import OrderDetailPage from './pages/admin/OrderDetailPage';
@@ -68,7 +70,9 @@ function App() {
           ) : (
             <>
               <button onClick={handleLogout} className="bg-gray-800 text-white px-3 py-1 rounded">登出</button>
-              <Link to="/cart" className="border px-2 py-1 rounded">購物車</Link>
+              {role !== "ADMIN" && (
+                <Link to="/cart" className="border px-2 py-1 rounded">購物車</Link>
+              )}
             </>
           )}
         </div>
@@ -132,6 +136,16 @@ function App() {
           <Route path="/admin/products" element={
             <ProtectedRoute loggedIn={loggedIn} requiredRole="ADMIN">
               <ProductAdminPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/products/new" element={
+            <ProtectedRoute loggedIn={loggedIn} requiredRole="ADMIN">
+              <ProductFormPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/products/:id" element={
+            <ProtectedRoute loggedIn={loggedIn} requiredRole="ADMIN">
+              <ProductDetailPage />
             </ProtectedRoute>
           } />
           <Route path="/admin/orders" element={

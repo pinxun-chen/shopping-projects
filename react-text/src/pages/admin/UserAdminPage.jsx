@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { getMe } from "../../api/userApi";
+import { useNavigate } from "react-router-dom";
 
 const UserAdminPage = () => {
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentUsername, setCurrentUsername] = useState("");
@@ -20,22 +23,15 @@ const UserAdminPage = () => {
   };
 
   const fetchCurrentUser = async () => {
-    const userId = localStorage.getItem("userId");
-    if (!userId) return;
-
     try {
-      const res = await fetch(`/users/${userId}`, { credentials: "include" });
-      const contentType = res.headers.get("content-type");
-      if (contentType && contentType.includes("application/json")) {
-        const result = await res.json();
-        if (result.status === 200) {
-          setCurrentUsername(result.data.username);
-        }
+      const res = await getMe(); // 改用 /users/me
+      if (res.status === 200) {
+        setCurrentUsername(res.data.username);
       } else {
-        console.error("伺服器未回傳 JSON 格式", await res.text());
+        console.warn("尚未登入", res.message);
       }
     } catch (err) {
-      console.error("取得登入使用者失敗", err);
+      console.error("取得目前登入使用者失敗", err);
     }
   };
 
@@ -99,7 +95,7 @@ const UserAdminPage = () => {
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">會員管理</h2>
-
+      
       <div className="mb-4">
         <input
           type="text"
@@ -117,7 +113,7 @@ const UserAdminPage = () => {
             <th className="border px-4 py-2">名稱</th>
             <th className="border px-4 py-2">Email</th>
             <th className="border px-4 py-2">角色</th>
-            <th className="border px-4 py-2">啟用</th>
+            <th className="border px-4 py-2">驗證</th>
             <th className="border px-4 py-2">操作</th>
           </tr>
         </thead>
@@ -147,6 +143,14 @@ const UserAdminPage = () => {
           ))}
         </tbody>
       </table>
+      <div className="mt-6 text-center">
+        <button
+          onClick={() => navigate("/admin")}
+          className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800"
+        >
+          返回後台管理
+        </button>
+      </div>
     </div>
   );
 };

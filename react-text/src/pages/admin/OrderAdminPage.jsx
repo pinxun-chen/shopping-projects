@@ -59,6 +59,14 @@ function OrderAdminPage() {
           ))}
         </tbody>
       </table>
+      <div className="mt-6 text-center">
+        <button
+          onClick={() => navigate("/admin")}
+          className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800"
+        >
+          返回後台管理
+        </button>
+      </div>
     </div>
   );
 }
