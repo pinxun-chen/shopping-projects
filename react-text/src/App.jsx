@@ -12,6 +12,7 @@ import UserProfilePage from './pages/UserProfilePage';
 import VerifyPage from './pages/VerifyPage';
 import HomePage from './pages/HomePage';
 import ProductListPage from './pages/ProductListPage';
+import ProductDetailPageUser from './pages/user/ProductDetailPageUser';
 import CartPage from './pages/CartPage';
 import OrderListPage from './pages/OrderListPage';
 import CheckoutPage from './pages/CheckoutPage';
@@ -101,6 +102,7 @@ function App() {
 
           {/* 使用者專屬頁面（USER） */}
           <Route path="/products" element={<ProductListPage />} />
+          <Route path="/products/:id" element={<ProductDetailPageUser />} />
           <Route path="/cart" element={
             <ProtectedRoute loggedIn={loggedIn} requiredRole="USER">
               <CartPage />

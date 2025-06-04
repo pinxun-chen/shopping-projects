@@ -1,7 +1,8 @@
-// src/pages/ProductListPage.jsx
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const ProductListPage = () => {
+  const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState('');
@@ -41,6 +42,7 @@ const ProductListPage = () => {
 
   // 加入購物車
   const handleAddToCart = async (productId) => {
+    e.stopPropagation(); // 防止點到卡片跳轉
     try {
       const res = await fetch('http://localhost:8082/api/cart/add', {
         method: 'POST',
@@ -111,7 +113,8 @@ const ProductListPage = () => {
       {/* 商品列表 */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {filteredProducts.map(product => (
-          <div key={product.id} className="border rounded-lg shadow p-4 flex flex-col hover:shadow-lg transition h-96">
+          <div key={product.id} className="border rounded-lg shadow p-4 flex flex-col hover:shadow-lg transition h-96"
+          onClick={() => navigate(`/products/${product.id}`)}>
                 <img
                     src={product.imageUrl || '/assets/no-image.png'}
                     alt={product.name}
