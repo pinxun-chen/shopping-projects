@@ -55,7 +55,7 @@ const OrderListPage = () => {
 
       {orders.map((order) => (
         <div key={order.orderId} className="border rounded-lg p-4 mb-6 shadow flex justify-between items-start gap-6">
-          {/* 左側：基本訂單資訊 */}
+          
           <div className="flex-1">
             <p><strong>訂單編號：</strong>{order.orderId}</p>
             <p><strong>總金額：</strong>${order.totalAmount}</p>
@@ -66,19 +66,27 @@ const OrderListPage = () => {
             <p><strong>收件地址：</strong>{order.receiverAddress || '未填寫'}</p>
           </div>
 
-          {/* 右側：商品明細 */}
-          <div className="flex-1 text-right">
-            <p className="font-semibold mb-2"> 商品明細：</p>
-            {order.items.map((item, index) => (
-              <div key={`${item.productId}-${index}`} className="flex justify-end items-center mb-2 gap-2">
-                <img
-                  src={item.imageUrl || "/assets/no-image.png"}
-                  alt={item.productName}
-                  className="w-12 h-12 object-cover rounded"
-                />
-                <p>{item.productName} × {item.quantity}（單價 ${item.price}）</p>
-              </div>
-            ))}
+          <div className="flex-1 flex flex-col justify-between items-end h-full">
+            <div className="w-full text-right">
+              <p className="font-semibold mb-2">商品明細：</p>
+              {order.items.map((item, index) => (
+                <div key={`${item.productId}-${index}`} className="flex justify-end items-center mb-2 gap-2">
+                  <img
+                    src={item.imageUrl || "/assets/no-image.png"}
+                    alt={item.productName}
+                    className="w-12 h-12 object-cover rounded"
+                  />
+                  <p>
+                    {item.productName} Size：{item.size} × {item.quantity}（單價 ${item.price}）
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* 右下：總金額 */}
+            <div className="text-green-700 font-bold text-lg mt-4 self-end">
+              總金額：${order.totalAmount}
+            </div>
           </div>
         </div>
       ))}

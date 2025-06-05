@@ -69,6 +69,9 @@ const CartPage = () => {
               <span className="font-semibold">商品名稱：</span>
               <span>{item.productName}</span>
 
+              <span className="font-semibold">尺寸：</span>
+              <span>{item.size || '無'}</span>
+
               <span className="font-semibold">單價：</span>
               <span>${item.unitPrice}</span>
 

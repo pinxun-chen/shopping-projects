@@ -51,7 +51,7 @@ function ProductFormPage() {
       description,
       price: parseInt(price),
       imageUrl,
-      category: { id: parseInt(categoryId) } // ✅ 傳給後端 category.id
+      category: { id: parseInt(categoryId) } // 傳給後端 category.id
     };
 
     try {

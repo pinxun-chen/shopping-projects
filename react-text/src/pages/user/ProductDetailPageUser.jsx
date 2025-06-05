@@ -5,7 +5,7 @@ function ProductDetailPageUser() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
-  const [selectedSize, setSelectedSize] = useState('');
+  const [selectedVariantId, setSelectedVariantId] = useState('');
 
   const fetchProduct = async () => {
     try {
@@ -22,14 +22,18 @@ function ProductDetailPageUser() {
   };
 
   const handleAddToCart = async () => {
-    if (!selectedSize) return alert('請選擇尺寸');
+    if (!selectedVariantId) return alert('請選擇尺寸');
 
     try {
       const res = await fetch('/api/cart/add', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ productId: product.id, size: selectedSize, quantity: 1 })
+        body: JSON.stringify({
+          productId: product.id,
+          variantId: Number(selectedVariantId),
+          quantity: 1
+        })
       });
       const data = await res.json();
       if (data.status === 200) {
@@ -61,12 +65,12 @@ function ProductDetailPageUser() {
         <label className="block mb-1">選擇尺寸：</label>
         <select
           className="border px-2 py-1"
-          value={selectedSize}
-          onChange={(e) => setSelectedSize(e.target.value)}
+          value={selectedVariantId}
+          onChange={(e) => setSelectedVariantId(e.target.value)}
         >
           <option value="">請選擇</option>
           {product.variants.map(v => (
-            <option key={v.variantId} value={v.size}>
+            <option key={v.variantId} value={v.variantId}>
               {v.size}（剩餘 {v.stock}）
             </option>
           ))}

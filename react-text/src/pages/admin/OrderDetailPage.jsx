@@ -46,21 +46,28 @@ const OrderDetailPage = () => {
 
       <div className="mt-6 bg-white shadow rounded p-6">
         <p className="font-semibold mb-3">商品明細：</p>
-        {state.items?.map((item, idx) => (
-          <div key={idx} className="flex items-center mb-3 gap-4">
-            <img
-              src={item.imageUrl || '/assets/no-image.png'}
-              alt={item.productName}
-              className="w-16 h-16 object-cover rounded border"
-            />
-            <div>
-              <p className="font-medium">{item.productName}</p>
-              <p className="text-sm text-gray-600">
-                數量：{item.quantity}，單價：${item.price}
-              </p>
+        {state.items?.map((item, idx) => {
+          console.log("order item:", item); // ✅ Debug log
+          if (!item.size) {
+            console.warn(`⚠️ 商品 ${item.productName} 的 size 為空或 undefined`);
+          }
+
+          return (
+            <div key={idx} className="flex items-center mb-3 gap-4">
+              <img
+                src={item.imageUrl || '/assets/no-image.png'}
+                alt={item.productName}
+                className="w-16 h-16 object-cover rounded border"
+              />
+              <div>
+                <p className="font-medium">{item.productName}</p>
+                <p className="text-sm text-gray-600">
+                  Size: {item.size || '無尺寸'} 數量：{item.quantity} 單價：${item.price}
+                </p>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="flex justify-between mt-8">

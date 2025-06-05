@@ -40,43 +40,7 @@ const ProductListPage = () => {
       .catch(err => console.error('取得商品錯誤', err));
   }, [selectedCategoryId]);
 
-  // 加入購物車
-  const handleAddToCart = async (productId) => {
-    e.stopPropagation(); // 防止點到卡片跳轉
-    try {
-      const res = await fetch('http://localhost:8082/api/cart/add', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // 重要：傳送 Session
-        body: JSON.stringify({
-          productId //: productId,
-          ,quantity: 1
-        })
-      });
-
-      if (res.status === 401) {
-        alert("請先登入才能加入購物車！");
-        return;
-      }
-
-      if (!res.ok) {
-        let text = "未知錯誤";
-        try {
-          text = await res.text(); // 這一行如果 response 是空的也會 throw
-        } catch (err) {
-          text = "伺服器錯誤（無錯誤訊息）";
-        }
-        alert("加入失敗: " + text);
-        return;
-      }
-
-      const result = await res.json();
-      alert(result.message || "已加入購物車");
-
-    } catch (err) {
-      alert("發生錯誤: " + err.message);
-    }
-  };
+  
 
 
   // 搜尋關鍵字過濾
@@ -124,10 +88,13 @@ const ProductListPage = () => {
                 <p className="text-sm text-gray-600 mb-1">價格: ${product.price}</p>
                 <p className="text-sm mb-3">分類: {product.categoryName || '無'}</p>
                 <button
-                    onClick={() => handleAddToCart(product.id)}
-                    className="mt-auto bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                  onClick={(e) => {
+                    e.stopPropagation(); // 不觸發整個卡片跳轉事件
+                    navigate(`/products/${product.id}`);
+                  }}
+                  className="mt-auto bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                 >
-                    加入購物車
+                  加入購物車
                 </button>
             </div>
         ))}
