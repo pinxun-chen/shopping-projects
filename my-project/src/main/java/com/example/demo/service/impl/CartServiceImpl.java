@@ -9,9 +9,11 @@ import org.springframework.stereotype.Service;
 import com.example.demo.model.dto.CartItemDto;
 import com.example.demo.model.entity.CartItem;
 import com.example.demo.model.entity.Product;
+import com.example.demo.model.entity.ProductVariant;
 import com.example.demo.model.entity.User;
 import com.example.demo.repository.CartItemRepository;
 import com.example.demo.repository.ProductRepository;
+import com.example.demo.repository.ProductVariantRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.CartService;
 
@@ -24,12 +26,14 @@ public class CartServiceImpl implements CartService {
     private final CartItemRepository cartItemRepo;
     private final ProductRepository productRepo;
     private final UserRepository userRepo;
+    private final ProductVariantRepository variantRepo;
 
     @Override
-    public void addToCart(Integer userId, Integer productId, Integer quantity) {
+    public void addToCart(Integer userId, Integer productId, Integer variantId, Integer quantity) {
         User user = userRepo.findById(userId).orElseThrow();
         Product product = productRepo.findById(productId).orElseThrow();
-
+        ProductVariant variant = variantRepo.findById(variantId).orElseThrow();
+        
         // 查詢是否已有相同商品在購物車
         Optional<CartItem> optionalItem = cartItemRepo.findByUserAndProduct(user, product);
 
@@ -43,6 +47,7 @@ public class CartServiceImpl implements CartService {
             CartItem newItem = new CartItem();
             newItem.setUser(user);
             newItem.setProduct(product);
+            newItem.setVariant(variant);
             newItem.setQuantity(quantity);
             cartItemRepo.save(newItem);
         }
@@ -62,6 +67,9 @@ public class CartServiceImpl implements CartService {
             dto.setUnitPrice(item.getProduct().getPrice());
             dto.setSubtotal(item.getQuantity() * item.getProduct().getPrice());
             dto.setImageUrl(item.getProduct().getImageUrl());
+            
+            dto.setSize(item.getVariant() != null ? item.getVariant().getSize() : "無尺寸");
+            
             return dto;
         }).collect(Collectors.toList());
     }

@@ -26,4 +26,8 @@ public class OrderItem {
 
     // 數量
     private Integer quantity;
+    
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "variant_id")
+    private ProductVariant variant;
 }

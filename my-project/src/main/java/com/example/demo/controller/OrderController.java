@@ -17,6 +17,7 @@ import com.example.demo.response.ApiResponse;
 import com.example.demo.service.OrderService;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -49,6 +50,7 @@ public class OrderController {
 
     // 查詢指定使用者的所有訂單
     @GetMapping("/{userId}")
+    @Transactional
     public ResponseEntity<ApiResponse<List<OrderDto>>> getOrders(@PathVariable Integer userId, HttpSession session) {
         UserCert cert = (UserCert) session.getAttribute("userCert");
 

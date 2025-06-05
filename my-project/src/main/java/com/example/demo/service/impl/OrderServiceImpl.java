@@ -14,10 +14,12 @@ import com.example.demo.model.dto.OrderItemDto;
 import com.example.demo.model.entity.CartItem;
 import com.example.demo.model.entity.Order;
 import com.example.demo.model.entity.OrderItem;
+import com.example.demo.model.entity.ProductVariant;
 import com.example.demo.model.entity.User;
 import com.example.demo.repository.CartItemRepository;
 import com.example.demo.repository.OrderItemRepository;
 import com.example.demo.repository.OrderRepository;
+import com.example.demo.repository.ProductVariantRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.EmailService;
 import com.example.demo.service.OrderService;
@@ -33,6 +35,8 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepo;
     private final OrderItemRepository orderItemRepo;
     private final UserRepository userRepo;
+    private final ProductVariantRepository variantRepo;
+    
     @Autowired
     private EmailService emailService;
 
@@ -62,11 +66,24 @@ public class OrderServiceImpl implements OrderService {
         int total = 0;
         List<OrderItem> orderItems = new ArrayList<>();
         for (CartItem cartItem : cartItems) {
+        	ProductVariant variant = cartItem.getVariant();
+	    	if (variant == null) {
+	            throw new RuntimeException("商品「" + cartItem.getProduct().getName() + "」未選擇尺寸，請確認購物車內容");
+	        }
+	
+	        int quantity = cartItem.getQuantity();
+	        if (variant.getStock() < quantity) {
+	            throw new RuntimeException("商品「" + variant.getProduct().getName() + "」的「" + variant.getSize() + "」尺寸庫存不足");
+	        }
+	
+	        variant.setStock(variant.getStock() - quantity); // 扣庫存
+            
             OrderItem item = new OrderItem();
             item.setOrder(order);
-            item.setProduct(cartItem.getProduct());
-            item.setPrice(cartItem.getProduct().getPrice());
-            item.setQuantity(cartItem.getQuantity());
+            item.setProduct(variant.getProduct());
+            item.setVariant(variant);
+            item.setPrice(variant.getProduct().getPrice());
+            item.setQuantity(quantity);
             orderItems.add(item);
             total += item.getPrice() * item.getQuantity();
         }
@@ -103,6 +120,9 @@ public class OrderServiceImpl implements OrderService {
             oidto.setProductName(oi.getProduct().getName());
             oidto.setPrice(oi.getPrice());
             oidto.setQuantity(oi.getQuantity());
+            oidto.setImageUrl(oi.getProduct().getImageUrl());
+            ProductVariant variant = oi.getVariant();
+            oidto.setSize(variant != null ? variant.getSize() : "無尺寸");
             return oidto;
         }).collect(Collectors.toList()));
         return dto;
@@ -132,6 +152,8 @@ public class OrderServiceImpl implements OrderService {
                 oidto.setQuantity(oi.getQuantity());
                 oidto.setPrice(oi.getPrice());
                 oidto.setImageUrl(oi.getProduct().getImageUrl());
+                ProductVariant variant = oi.getVariant();
+                oidto.setSize(variant != null ? variant.getSize() : "無尺寸");
                 return oidto;
             }).collect(Collectors.toList());
 
@@ -168,6 +190,9 @@ public class OrderServiceImpl implements OrderService {
             itemDto.setProductName(item.getProduct().getName());
             itemDto.setPrice(item.getPrice());
             itemDto.setQuantity(item.getQuantity());
+            itemDto.setImageUrl(item.getProduct().getImageUrl());
+            ProductVariant variant = item.getVariant();
+            itemDto.setSize(variant != null ? variant.getSize() : "無尺寸");
             return itemDto;
         }).collect(Collectors.toList());
         dto.setItems(itemDtos);

@@ -109,6 +109,7 @@ public class AdminServiceImpl implements AdminService {
         userRepo.delete(user);
         return true;
     }    
+    
     @Override
     public List<OrderDto> getAllOrders() {
         List<Order> orders = orderRepo.findAll();
@@ -133,6 +134,11 @@ public class AdminServiceImpl implements AdminService {
                 itemDto.setQuantity(item.getQuantity());
                 itemDto.setPrice(item.getPrice());
                 itemDto.setImageUrl(item.getProduct().getImageUrl());
+                if (item.getVariant() != null) {
+                    itemDto.setSize(item.getVariant().getSize());
+                } else {
+                    itemDto.setSize("無尺寸");
+                }
                 return itemDto;
             }).collect(Collectors.toList());
 

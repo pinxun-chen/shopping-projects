@@ -23,4 +23,8 @@ public class CartItem {
 
     // 購買數量
     private Integer quantity;
+    
+    @ManyToOne
+    @JoinColumn(name = "variant_id")
+    private ProductVariant variant;
 }

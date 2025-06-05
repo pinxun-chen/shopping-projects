@@ -58,9 +58,14 @@ public class CartController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(ApiResponse.error(401, "請先登入!"));
         }
+        
+        if (request.getVariantId() == null) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error(400, "請選擇商品尺寸"));
+        }
 
         // 不再使用前端傳來的 userId，直接從 session 取出
-        cartService.addToCart(cert.getUserId(), request.getProductId(), request.getQuantity());
+        cartService.addToCart(cert.getUserId(), request.getProductId(), request.getVariantId(), request.getQuantity());
         return ResponseEntity.ok(ApiResponse.success("加入成功", null));
     }
 

@@ -9,4 +9,5 @@ public class OrderItemDto {
     private Integer quantity;
     private Integer price;// 單價
     private String imageUrl;
+    private String size;
 }

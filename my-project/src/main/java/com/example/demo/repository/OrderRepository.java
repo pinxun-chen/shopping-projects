@@ -19,6 +19,6 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
 
     // 管理者查詢所有訂單，並抓出每張訂單的明細與會員資訊
     @Override
-    @EntityGraph(attributePaths = {"orderItems", "orderItems.product", "user"})
+    @EntityGraph(attributePaths = {"orderItems", "orderItems.product", "orderItems.variant", "user"})
     List<Order> findAll();
 }
