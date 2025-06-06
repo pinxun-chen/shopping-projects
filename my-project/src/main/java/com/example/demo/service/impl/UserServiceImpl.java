@@ -8,7 +8,6 @@ import com.example.demo.repository.VerificationTokenRepository;
 import com.example.demo.service.EmailService;
 import com.example.demo.service.UserService;
 import com.example.demo.util.Hash;
-import com.example.demo.exception.CertException;
 import com.example.demo.mapper.UserMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;

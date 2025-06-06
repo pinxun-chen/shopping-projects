@@ -1,8 +1,6 @@
 package com.example.demo.service;
 
-import com.example.demo.exception.CertException;
 import com.example.demo.model.dto.UserDto;
-import com.example.demo.model.entity.User;
 
 import java.util.Optional;
 

@@ -34,16 +34,37 @@ public class CartServiceImpl implements CartService {
         Product product = productRepo.findById(productId).orElseThrow();
         ProductVariant variant = variantRepo.findById(variantId).orElseThrow();
         
+        // 驗證該變體是否屬於此商品
+        if (!variant.getProduct().getId().equals(product.getId())) {
+            throw new RuntimeException("尺寸資訊錯誤，請重新選擇");
+        }
+        
+        // 若庫存不足，拒絕加入
+        if (variant.getStock() <= 0) {
+            throw new RuntimeException("該尺寸已售完，無法加入購物車");
+        }
+        
         // 查詢是否已有相同商品在購物車
         Optional<CartItem> optionalItem = cartItemRepo.findByUserAndProductAndVariant(user, product, variant);
 
         if (optionalItem.isPresent()) {
             // 若已有商品，數量相加
             CartItem existingItem = optionalItem.get();
-            existingItem.setQuantity(existingItem.getQuantity() + quantity);
+            
+            // 驗證合併後是否超過庫存
+            int newQuantity = existingItem.getQuantity() + quantity;
+            if (newQuantity > variant.getStock()) {
+                throw new RuntimeException("加入數量超過庫存");
+            }
+            
+            existingItem.setQuantity(newQuantity);
             cartItemRepo.save(existingItem);
         } else {
             // 否則新增
+        	// 新增新項目前也驗證一次
+            if (quantity > variant.getStock()) {
+                throw new RuntimeException("加入數量超過庫存");
+            }
             CartItem newItem = new CartItem();
             newItem.setUser(user);
             newItem.setProduct(product);

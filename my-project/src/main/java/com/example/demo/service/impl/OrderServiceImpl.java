@@ -17,9 +17,7 @@ import com.example.demo.model.entity.OrderItem;
 import com.example.demo.model.entity.ProductVariant;
 import com.example.demo.model.entity.User;
 import com.example.demo.repository.CartItemRepository;
-import com.example.demo.repository.OrderItemRepository;
 import com.example.demo.repository.OrderRepository;
-import com.example.demo.repository.ProductVariantRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.EmailService;
 import com.example.demo.service.OrderService;
@@ -33,9 +31,7 @@ public class OrderServiceImpl implements OrderService {
 
     private final CartItemRepository cartRepo;
     private final OrderRepository orderRepo;
-    private final OrderItemRepository orderItemRepo;
     private final UserRepository userRepo;
-    private final ProductVariantRepository variantRepo;
     
     @Autowired
     private EmailService emailService;
@@ -97,14 +93,34 @@ public class OrderServiceImpl implements OrderService {
         // 寄送 Email 通知
         if (user.getEmail() != null && !user.getEmail().isEmpty()) {
             String subject = "訂單確認通知";
+
+            // 組裝商品明細 HTML
+            StringBuilder itemsHtml = new StringBuilder();
+            for (OrderItem item : order.getOrderItems()) {
+                String size = (item.getVariant() != null) ? item.getVariant().getSize() : "無";
+                itemsHtml.append("<li>")
+                    .append(item.getProduct().getName())
+                    .append(" - 尺寸：")
+                    .append(size)
+                    .append(" × ")
+                    .append(item.getQuantity())
+                    .append("（單價 $")
+                    .append(item.getPrice())
+                    .append("）</li>");
+            }
+
+            // 組裝信件內容
             String content = "<h3>您好，" + user.getUsername() + "</h3>"
                 + "<p>您的訂單已成功建立，感謝您的購買。</p>"
                 + "<ul>"
                 + "<li>訂單編號：<strong>" + order.getId() + "</strong></li>"
+                + "</ul>"
+                + "<p>訂單商品：</p>"
+                + "<ul>" + itemsHtml + "</ul>"
                 + "<li>總金額：<strong>$" + order.getTotalAmount() + "</strong></li>"
                 + "<li>建立時間：<strong>" + order.getOrderTime().format(FORMATTER) + "</strong></li>"
-                + "</ul>"
                 + "<p>如有任何問題歡迎與我們聯繫。</p>";
+
             emailService.sendMail(user.getEmail(), subject, content);
         }
 
