@@ -28,8 +28,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { logout, checkLogin } from './api/userApi';
 
 function App() {
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [role, setRole] = useState("");
+  const [loggedIn, setLoggedIn] = useState(() => localStorage.getItem("loggedIn") === "true");
+  const [role, setRole] = useState(localStorage.getItem("role") || "");
 
   const handleLogout = async () => {
     await logout();
@@ -40,32 +40,16 @@ function App() {
   };
 
   useEffect(() => {
-    const verifySession = async () => {
-      try {
-        const res = await checkLogin();
-        if (res.status === 200 && res.data.loggedIn) {
-          setLoggedIn(true);
-          const userInfo = await getMe();
-          if (userInfo.status === 200) {
-            setRole(userInfo.data.role);
-            localStorage.setItem("loggedIn", "true");
-            localStorage.setItem("role", userInfo.data.role);
-          }
-        } else {
-          setLoggedIn(false);
-          setRole("");
-          localStorage.clear();
-        }
-      } catch (error) {
-        console.error("檢查登入失敗", error);
-        setLoggedIn(false);
-        setRole("");
-        localStorage.clear();
+    checkLogin().then(res => {
+      if (res.success && res.data === true) {
+        setLoggedIn(true);
+        localStorage.setItem("loggedIn", "true");
+        const storedRole = localStorage.getItem("role");
+        if (storedRole) setRole(storedRole);
       }
-    };
-
-    verifySession();
+    });
   }, []);
+
 
   return (
     <Router>
