@@ -41,7 +41,7 @@ function App() {
 
   useEffect(() => {
     checkLogin().then(res => {
-      if (res.success && res.data === true) {
+      if (res.status === 200 && res.data === true) {
         setLoggedIn(true);
         localStorage.setItem("loggedIn", "true");
         const storedRole = localStorage.getItem("role");
