@@ -35,7 +35,7 @@ public class CartServiceImpl implements CartService {
         ProductVariant variant = variantRepo.findById(variantId).orElseThrow();
         
         // 查詢是否已有相同商品在購物車
-        Optional<CartItem> optionalItem = cartItemRepo.findByUserAndProduct(user, product);
+        Optional<CartItem> optionalItem = cartItemRepo.findByUserAndProductAndVariant(user, product, variant);
 
         if (optionalItem.isPresent()) {
             // 若已有商品，數量相加

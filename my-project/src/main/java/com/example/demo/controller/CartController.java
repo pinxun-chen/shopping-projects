@@ -59,6 +59,11 @@ public class CartController {
                     .body(ApiResponse.error(401, "請先登入!"));
         }
         
+        if ("ADMIN".equals(cert.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.error(403, "管理員無法加入購物車"));
+        }
+        
         if (request.getVariantId() == null) {
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error(400, "請選擇商品尺寸"));
