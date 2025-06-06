@@ -2,6 +2,7 @@ package com.example.demo.service.impl;
 
 import com.example.demo.model.entity.Category;
 import com.example.demo.repository.CategoryRepository;
+import com.example.demo.repository.ProductRepository;
 import com.example.demo.service.CategoryService;
 
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import java.util.Optional;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final ProductRepository productRepository;
 
     @Override
     public List<Category> getAllCategories() {
@@ -40,5 +42,10 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public void deleteCategory(Integer id) {
         categoryRepository.deleteById(id);
+    }
+    
+    @Override
+    public boolean canDeleteCategory(Integer categoryId) {
+        return productRepository.countByCategoryId(categoryId) == 0;
     }
 }

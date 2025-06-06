@@ -42,6 +42,11 @@ public class CategoryController {
     // 刪除分類
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<String>> deleteCategory(@PathVariable Integer id) {
+        if (!categoryService.canDeleteCategory(id)) {
+            return ResponseEntity.badRequest()
+                .body(ApiResponse.error(400, "該分類下仍有商品，無法刪除"));
+        }
+
         categoryService.deleteCategory(id);
         return ResponseEntity.ok(ApiResponse.success("刪除分類成功", null));
     }

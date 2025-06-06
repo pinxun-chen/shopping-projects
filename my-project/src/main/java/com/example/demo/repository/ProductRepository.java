@@ -10,4 +10,5 @@ import com.example.demo.model.entity.Product;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Integer> {
     List<Product> findByCategoryId(Integer categoryId);
+    long countByCategoryId(Integer categoryId);
 }

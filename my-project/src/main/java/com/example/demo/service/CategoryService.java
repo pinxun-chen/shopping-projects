@@ -11,4 +11,5 @@ public interface CategoryService {
 	void createCategory(Category category);
 	void updateCategory(Integer id, Category category);
 	void deleteCategory(Integer id);
+	boolean canDeleteCategory(Integer categoryId);
 }
