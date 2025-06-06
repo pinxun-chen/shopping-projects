@@ -43,15 +43,13 @@ function App() {
     const verifySession = async () => {
       try {
         const res = await checkLogin();
-        if (res.success && res.data === true) {
+        if (res.status === 200 && res.data.loggedIn) {
           setLoggedIn(true);
           const userInfo = await getMe();
-          if (userInfo.success) {
+          if (userInfo.status === 200) {
             setRole(userInfo.data.role);
             localStorage.setItem("loggedIn", "true");
             localStorage.setItem("role", userInfo.data.role);
-          } else {
-            setRole(""); // 萬一 getMe 失敗還是清除
           }
         } else {
           setLoggedIn(false);
@@ -59,6 +57,7 @@ function App() {
           localStorage.clear();
         }
       } catch (error) {
+        console.error("檢查登入失敗", error);
         setLoggedIn(false);
         setRole("");
         localStorage.clear();
