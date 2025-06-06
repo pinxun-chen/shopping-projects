@@ -28,8 +28,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { logout, checkLogin } from './api/userApi';
 
 function App() {
-  const [loggedIn, setLoggedIn] = useState(() => localStorage.getItem("loggedIn") === "true");
-  const [role, setRole] = useState(localStorage.getItem("role") || "");
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [role, setRole] = useState("");
 
   const handleLogout = async () => {
     await logout();
@@ -42,12 +42,17 @@ function App() {
   useEffect(() => {
     const verifySession = async () => {
       try {
-        const res = await getMe();
-        if (res.status === 200 && res.data) {
+        const res = await checkLogin();
+        if (res.success && res.data === true) {
           setLoggedIn(true);
-          setRole(res.data.role);
-          localStorage.setItem("loggedIn", "true");
-          localStorage.setItem("role", res.data.role);
+          const userInfo = await getMe();
+          if (userInfo.success) {
+            setRole(userInfo.data.role);
+            localStorage.setItem("loggedIn", "true");
+            localStorage.setItem("role", userInfo.data.role);
+          } else {
+            setRole(""); // 萬一 getMe 失敗還是清除
+          }
         } else {
           setLoggedIn(false);
           setRole("");

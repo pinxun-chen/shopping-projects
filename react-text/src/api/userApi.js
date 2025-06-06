@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:8082/users';
+const API_BASE = '/users';
 
 // 工具方法：統一解析 JSON（避免 HTML 回傳時報錯）
 const safeJson = async (res) => {
@@ -14,6 +14,7 @@ const safeJson = async (res) => {
 export const login = async (username, password) => {
   const res = await fetch(`${API_BASE}/login`, {
     method: 'POST',
+    credentials: 'include',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({ username, password }),
     credentials: 'include'

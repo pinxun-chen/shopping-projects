@@ -6,7 +6,8 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/api': 'http://localhost:8082' // ✅ 統一 proxy 所有 API
+      '/api': 'http://localhost:8082', // 統一 proxy 所有 API
+      '/users': 'http://localhost:8082'
     }
   }
 })
