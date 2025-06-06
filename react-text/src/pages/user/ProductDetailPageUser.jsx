@@ -6,6 +6,7 @@ function ProductDetailPageUser() {
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [selectedVariantId, setSelectedVariantId] = useState('');
+  const [selectedStock, setSelectedStock] = useState(0);
 
   const fetchProduct = async () => {
     try {
@@ -23,6 +24,7 @@ function ProductDetailPageUser() {
 
   const handleAddToCart = async () => {
     if (!selectedVariantId) return alert('請選擇尺寸');
+    if (selectedStock <= 0) return alert('該尺寸已售完');
 
     try {
       const res = await fetch('/api/cart/add', {
@@ -38,7 +40,6 @@ function ProductDetailPageUser() {
       const data = await res.json();
       if (data.status === 200) {
         alert('已加入購物車');
-        navigate('/cart');
       } else {
         alert(data.message);
       }
@@ -50,6 +51,15 @@ function ProductDetailPageUser() {
   useEffect(() => {
     fetchProduct();
   }, [id]);
+
+  useEffect(() => {
+    if (!selectedVariantId || !product) {
+      setSelectedStock(0);
+      return;
+    }
+    const variant = product.variants.find(v => v.variantId === Number(selectedVariantId));
+    setSelectedStock(variant?.stock || 0);
+  }, [selectedVariantId, product]);
 
   if (!product) return <div className="p-4">載入中...</div>;
 
@@ -70,8 +80,8 @@ function ProductDetailPageUser() {
         >
           <option value="">請選擇</option>
           {product.variants.map(v => (
-            <option key={v.variantId} value={v.variantId}>
-              {v.size}（剩餘 {v.stock}）
+            <option key={v.variantId} value={v.variantId} disabled={v.stock === 0}>
+              {v.size}（{v.stock === 0 ? '售完' : `剩餘 ${v.stock}`}）
             </option>
           ))}
         </select>
@@ -80,7 +90,12 @@ function ProductDetailPageUser() {
       <div className="mt-6 text-center">
         <button
           onClick={handleAddToCart}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          disabled={!selectedVariantId || selectedStock <= 0}
+          className={`px-4 py-2 rounded text-white ${
+            !selectedVariantId || selectedStock <= 0
+              ? 'bg-gray-400 cursor-not-allowed'
+              : 'bg-blue-600 hover:bg-blue-700'
+          }`}
         >
           加入購物車
         </button>

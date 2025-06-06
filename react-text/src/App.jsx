@@ -40,14 +40,27 @@ function App() {
   };
 
   useEffect(() => {
-    checkLogin().then(res => {
-      if (res.success && res.data === true) {
-        setLoggedIn(true);
-        localStorage.setItem("loggedIn", "true");
-        const storedRole = localStorage.getItem("role");
-        if (storedRole) setRole(storedRole);
+    const verifySession = async () => {
+      try {
+        const res = await getMe();
+        if (res.status === 200 && res.data) {
+          setLoggedIn(true);
+          setRole(res.data.role);
+          localStorage.setItem("loggedIn", "true");
+          localStorage.setItem("role", res.data.role);
+        } else {
+          setLoggedIn(false);
+          setRole("");
+          localStorage.clear();
+        }
+      } catch (error) {
+        setLoggedIn(false);
+        setRole("");
+        localStorage.clear();
       }
-    });
+    };
+
+    verifySession();
   }, []);
 
   return (
