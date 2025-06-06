@@ -42,12 +42,39 @@ function ProductFormPage() {
         alert('新增分類成功');
         setNewCategory('');
         setShowAddCategory(false);
-        fetchCategories();
+        const updatedRes = await fetch('/api/category');
+        const updatedData = await updatedRes.json();
+        if (updatedData.status === 200) {
+          setCategories(updatedData.data);
+          const added = updatedData.data.find(cat => cat.name === newCategory);
+          if (added) {
+            setForm(prev => ({ ...prev, categoryId: added.id }));
+          }
+        }
       } else {
         alert(data.message || '新增分類失敗');
       }
     } catch (err) {
       alert('新增分類錯誤: ' + err.message);
+    }
+  };
+
+  const handleDeleteCategory = async (id) => {
+    if (!window.confirm('確定要刪除此分類？')) return;
+    try {
+      const res = await fetch(`/api/category/${id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      const data = await res.json();
+      if (data.status === 200) {
+        alert('刪除成功');
+        fetchCategories();
+      } else {
+        alert(data.message || '刪除失敗');
+      }
+    } catch (err) {
+      alert('刪除分類錯誤: ' + err.message);
     }
   };
 
@@ -103,59 +130,53 @@ function ProductFormPage() {
       <h2 className="text-xl font-bold mb-4">新增商品</h2>
 
       <label className="block mb-2">名稱</label>
-      <input
-        className="border w-full px-3 py-2 mb-4"
-        name="name"
-        value={form.name}
-        onChange={handleChange}
-      />
+      <input className="border w-full px-3 py-2 mb-4" name="name" value={form.name} onChange={handleChange} />
 
       <label className="block mb-2">描述</label>
-      <textarea
-        className="border w-full px-3 py-2 mb-4"
-        name="description"
-        value={form.description}
-        onChange={handleChange}
-      />
+      <textarea className="border w-full px-3 py-2 mb-4" name="description" value={form.description} onChange={handleChange} />
 
       <label className="block mb-2">價格</label>
-      <input
-        type="number"
-        min="0"
-        className="border w-full px-3 py-2 mb-4"
-        name="price"
-        value={form.price}
-        onChange={handleChange}
-      />
+      <input type="number" min="0" className="border w-full px-3 py-2 mb-4" name="price" value={form.price} onChange={handleChange} />
 
       <label className="block mb-2">圖片網址</label>
-      <input
-        className="border w-full px-3 py-2 mb-4"
-        name="imageUrl"
-        value={form.imageUrl}
-        onChange={handleChange}
-      />
+      <input className="border w-full px-3 py-2 mb-4" name="imageUrl" value={form.imageUrl} onChange={handleChange} />
 
       <label className="block mb-2">分類</label>
-      <div className="flex gap-2 mb-2">
-        <select
-          className="border w-full px-3 py-2"
-          name="categoryId"
-          value={form.categoryId}
-          onChange={handleChange}
-        >
-          <option value="">請選擇分類</option>
+      <div className="mb-2">
+        <div className="flex gap-2">
+          <select
+            className="border w-full px-3 py-2"
+            name="categoryId"
+            value={form.categoryId}
+            onChange={handleChange}
+          >
+            <option value="">請選擇分類</option>
+            {categories.map(cat => (
+              <option key={cat.id} value={cat.id}>{cat.name}</option>
+            ))}
+          </select>
+          <button
+            type="button"
+            onClick={() => setShowAddCategory(!showAddCategory)}
+            className="text-blue-600 underline whitespace-nowrap"
+          >
+            新增分類
+          </button>
+        </div>
+
+        <div className="mt-2 grid grid-cols-2 gap-2">
           {categories.map(cat => (
-            <option key={cat.id} value={cat.id}>{cat.name}</option>
+            <div key={cat.id} className="flex justify-between items-center border p-2 rounded">
+              <span>{cat.name}</span>
+              <button
+                className="text-red-600 hover:text-red-800"
+                onClick={() => handleDeleteCategory(cat.id)}
+              >
+                刪除分類
+              </button>
+            </div>
           ))}
-        </select>
-        <button
-          type="button"
-          onClick={() => setShowAddCategory(!showAddCategory)}
-          className="text-blue-600 underline whitespace-nowrap"
-        >
-          新增分類
-        </button>
+        </div>
       </div>
 
       {showAddCategory && (
@@ -186,17 +207,10 @@ function ProductFormPage() {
       )}
 
       <div className="flex justify-center gap-2 mt-4">
-        <button
-          onClick={handleSubmit}
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-        >
+        <button onClick={handleSubmit} className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
           新增商品
         </button>
-
-        <button
-          onClick={() => navigate('/admin/products')}
-          className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800"
-        >
+        <button onClick={() => navigate('/admin/products')} className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800">
           返回商品列表
         </button>
       </div>
