@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 function ProductAdminPage() {
   const [products, setProducts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
   const fetchProducts = async () => {
@@ -23,9 +24,22 @@ function ProductAdminPage() {
     fetchProducts();
   }, []);
 
+  const filteredProducts = products.filter((p) =>
+    `${p.name} ${p.categoryName}`.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">商品管理</h2>
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="搜尋"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="border px-3 py-2 rounded w-full max-w-sm"
+        />
+      </div>
       <div className="flex justify-end mb-2">
         <button
           onClick={() => navigate('/admin/products/new')}
@@ -46,7 +60,7 @@ function ProductAdminPage() {
           </tr>
         </thead>
         <tbody>
-          {products.map((p) => (
+          {filteredProducts.map((p) => (
             <tr key={p.id} className="hover:bg-gray-50">
               <td className="border px-4 py-2">
                 <img src={p.imageUrl} alt={p.name} className="w-16 h-16 object-cover" />
@@ -67,14 +81,14 @@ function ProductAdminPage() {
         </tbody>
       </table>
 
-      <div className="mt-6 text-center">
+      {/* <div className="mt-6 text-center">
         <button
           onClick={() => navigate('/admin')}
           className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800"
         >
           返回後台管理
         </button>
-      </div>
+      </div> */}
     </div>
   );
 }

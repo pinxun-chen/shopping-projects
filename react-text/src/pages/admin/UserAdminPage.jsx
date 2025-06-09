@@ -89,7 +89,7 @@ const UserAdminPage = () => {
   };
 
   const filteredUsers = users.filter((u) =>
-    `${u.username} ${u.email}`.toLowerCase().includes(searchTerm.toLowerCase())
+    `${u.username} ${u.email} ${u.role}`.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -99,7 +99,7 @@ const UserAdminPage = () => {
       <div className="mb-4">
         <input
           type="text"
-          placeholder="搜尋帳號或 Email"
+          placeholder="搜尋"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="border px-3 py-2 rounded w-full max-w-sm"
@@ -112,7 +112,7 @@ const UserAdminPage = () => {
             <th className="border px-4 py-2">ID</th>
             <th className="border px-4 py-2">名稱</th>
             <th className="border px-4 py-2">Email</th>
-            <th className="border px-4 py-2">角色</th>
+            <th className="border px-4 py-2">權限</th>
             <th className="border px-4 py-2">驗證</th>
             <th className="border px-4 py-2">操作</th>
           </tr>
@@ -143,14 +143,14 @@ const UserAdminPage = () => {
           ))}
         </tbody>
       </table>
-      <div className="mt-6 text-center">
+      {/* <div className="mt-6 text-center">
         <button
           onClick={() => navigate("/admin")}
           className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800"
         >
           返回後台管理
         </button>
-      </div>
+      </div> */}
     </div>
   );
 };

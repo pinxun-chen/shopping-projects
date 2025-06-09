@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 function OrderAdminPage() {
   const [orders, setOrders] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
   const fetchOrders = async () => {
@@ -27,9 +28,24 @@ function OrderAdminPage() {
     navigate(`/admin/orders/${order.orderId}`, { state: order });
   };
 
+  const filteredOrders = orders.filter((o) =>
+    `${o.orderId} ${o.userId} ${o.formattedTime} ${o.totalAmount}`.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">訂單管理</h2>
+
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="搜尋"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="border px-3 py-2 rounded w-full max-w-sm"
+        />
+      </div>
+
       <table className="min-w-full border">
         <thead>
           <tr className="bg-gray-100">
@@ -41,7 +57,7 @@ function OrderAdminPage() {
           </tr>
         </thead>
         <tbody>
-          {orders.map((o) => (
+          {filteredOrders.map((o) => (
             <tr key={o.orderId}>
               <td className="border px-4 py-2">{o.orderId}</td>
               <td className="border px-4 py-2">{o.userId}</td>
@@ -59,14 +75,14 @@ function OrderAdminPage() {
           ))}
         </tbody>
       </table>
-      <div className="mt-6 text-center">
+      {/* <div className="mt-6 text-center">
         <button
           onClick={() => navigate("/admin")}
           className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800"
         >
           返回後台管理
         </button>
-      </div>
+      </div> */}
     </div>
   );
 }

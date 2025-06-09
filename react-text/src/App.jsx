@@ -23,6 +23,7 @@ import ProductDetailPage from './pages/admin/ProductDetailPage';
 import OrderAdminPage from './pages/admin/OrderAdminPage';
 import UserAdminPage from './pages/admin/UserAdminPage';
 import OrderDetailPage from './pages/admin/OrderDetailPage';
+import ProductReportPage from './pages/admin/ProductReportPage';
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import { logout, checkLogin } from './api/userApi';
@@ -59,9 +60,26 @@ function App() {
           <Link to="/">Home</Link>
         </div>
         <div className="space-x-4">
-          <Link to="/products" className="hover:underline">所有商品</Link>
-          {role === "USER" && <Link to="/orders" className="hover:underline">歷史訂單</Link>}
-          {role === "ADMIN" && <Link to="/admin" className="hover:underline">後台管理</Link>}
+          {!loggedIn ? (
+            <Link to="/products" className="hover:underline">所有商品</Link>
+          ):(
+            <>
+              {role === "USER" && (
+                <>
+                  <Link to="/products" className="hover:underline">所有商品</Link>
+                  <Link to="/orders" className="hover:underline">歷史訂單</Link>
+                </>
+              )}
+              {role === "ADMIN" && (
+                <>
+                  <Link to="/admin/products" className="hover:underline">商品管理</Link>
+                  <Link to="/admin/orders" className="hover:underline">訂單管理</Link>
+                  <Link to="/admin/users" className="hover:underline">會員管理</Link>
+                  <Link to="/admin/report" className="hover:underline">銷售報表</Link>
+                </>
+              )}
+            </>
+          )}
         </div>
         <div className="space-x-2">
           {!loggedIn ? (
@@ -73,7 +91,9 @@ function App() {
             <>
               <button onClick={handleLogout} className="bg-gray-800 text-white px-3 py-1 rounded">登出</button>
               {role !== "ADMIN" && (
-                <Link to="/cart" className="border px-2 py-1 rounded">購物車</Link>
+                <>
+                  <Link to="/cart" className="border px-2 py-1 rounded">購物車</Link>
+                </>
               )}
             </>
           )}
@@ -131,11 +151,11 @@ function App() {
           } />
 
           {/* 管理員專屬頁面（ADMIN） */}
-          <Route path="/admin" element={
+          {/* <Route path="/admin" element={
             <ProtectedRoute loggedIn={loggedIn} requiredRole="ADMIN">
               <AdminDashboard />
             </ProtectedRoute>
-          } />
+          } /> */}
           <Route path="/admin/products" element={
             <ProtectedRoute loggedIn={loggedIn} requiredRole="ADMIN">
               <ProductAdminPage />
@@ -164,6 +184,11 @@ function App() {
           <Route path="/admin/users" element={
             <ProtectedRoute loggedIn={loggedIn} requiredRole="ADMIN">
               <UserAdminPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/report" element={
+            <ProtectedRoute loggedIn={loggedIn} requiredRole="ADMIN">
+              <ProductReportPage />
             </ProtectedRoute>
           } />
         </Routes>
