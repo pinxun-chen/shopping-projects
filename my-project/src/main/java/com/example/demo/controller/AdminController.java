@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.dto.ProductDto;
+import com.example.demo.model.dto.ProductSalesDto;
 import com.example.demo.model.entity.User;
 import com.example.demo.response.ApiResponse;
 import com.example.demo.service.AdminService;
@@ -110,6 +111,13 @@ public class AdminController {
         } else {
             return ResponseEntity.status(404).body(ApiResponse.error(404, "查無此訂單"));
         }
+    }
+    
+    // 商品銷售報表
+    @GetMapping("/report/product-sales")
+    public ResponseEntity<ApiResponse<List<ProductSalesDto>>> getProductSalesReport() {
+        List<ProductSalesDto> report = adminService.getProductSalesReport();
+        return ResponseEntity.ok(ApiResponse.success("報表查詢成功", report));
     }
     
 }

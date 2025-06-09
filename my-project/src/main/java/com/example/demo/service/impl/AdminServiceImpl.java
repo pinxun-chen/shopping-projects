@@ -3,12 +3,14 @@ package com.example.demo.service.impl;
 import com.example.demo.model.dto.OrderDto;
 import com.example.demo.model.dto.OrderItemDto;
 import com.example.demo.model.dto.ProductDto;
+import com.example.demo.model.dto.ProductSalesDto;
 import com.example.demo.model.entity.Category;
 import com.example.demo.model.entity.Order;
 import com.example.demo.model.entity.Product;
 import com.example.demo.model.entity.User;
 import com.example.demo.repository.CartItemRepository;
 import com.example.demo.repository.CategoryRepository;
+import com.example.demo.repository.OrderItemRepository;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.ProductRepository;
 import com.example.demo.repository.UserRepository;
@@ -32,6 +34,7 @@ public class AdminServiceImpl implements AdminService {
     private final OrderRepository orderRepo;
     private final UserRepository userRepo;
     private final CartItemRepository cartItemRepo;
+    private final OrderItemRepository orderItemRepo;
 
     @Override
     public List<ProductDto> getAllProducts() {
@@ -153,6 +156,12 @@ public class AdminServiceImpl implements AdminService {
             orderRepo.delete(order);
             return true;
         }).orElse(false);
+    }
+    
+    // 報表統計實作
+    @Override
+    public List<ProductSalesDto> getProductSalesReport() {
+        return orderItemRepo.findProductSalesReport();
     }
 
 }

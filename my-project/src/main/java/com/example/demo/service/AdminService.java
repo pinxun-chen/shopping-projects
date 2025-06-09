@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.model.dto.OrderDto;
 import com.example.demo.model.dto.ProductDto;
+import com.example.demo.model.dto.ProductSalesDto;
 import com.example.demo.model.entity.User;
 
 import java.util.List;
@@ -20,4 +21,6 @@ public interface AdminService {
     
     // 提供給管理者刪除訂單
     boolean cancelOrder(Integer orderId);
+    
+    List<ProductSalesDto> getProductSalesReport();
 }
