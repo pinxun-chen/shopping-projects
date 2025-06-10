@@ -24,6 +24,7 @@ import OrderAdminPage from './pages/admin/OrderAdminPage';
 import UserAdminPage from './pages/admin/UserAdminPage';
 import OrderDetailPage from './pages/admin/OrderDetailPage';
 import ProductReportPage from './pages/admin/ProductReportPage';
+import ProductSalesChart from './pages/admin/ProductSalesChart';
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import { logout, checkLogin } from './api/userApi';
@@ -189,6 +190,11 @@ function App() {
           <Route path="/admin/report" element={
             <ProtectedRoute loggedIn={loggedIn} requiredRole="ADMIN">
               <ProductReportPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/report-chart" element={
+            <ProtectedRoute loggedIn={loggedIn} requiredRole="ADMIN">
+              <ProductSalesChart />
             </ProtectedRoute>
           } />
         </Routes>
