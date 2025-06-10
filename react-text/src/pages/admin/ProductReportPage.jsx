@@ -25,16 +25,9 @@ const ProductReportPage = () => {
 
   return (
     <div className="p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-center w-full">商品銷售報表</h2>
-        <button
-          onClick={() => navigate('/admin/report-chart')}
-          className="ml-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 whitespace-nowrap"
-        >
-          查看圖表
-        </button>
-      </div>
 
+      <h2 className="text-xl font-bold mb-4">商品銷售報表</h2>
+        
       <div className="mb-4">
         <input
           type="text"
@@ -43,6 +36,15 @@ const ProductReportPage = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="border px-3 py-2 rounded w-full max-w-sm"
         />
+      </div>
+
+      <div className="flex justify-end mb-2">
+        <button
+          onClick={() => navigate('/admin/report-chart')}
+          className="ml-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          查看圖表
+        </button>
       </div>
 
       <table className="min-w-full border text-center">
