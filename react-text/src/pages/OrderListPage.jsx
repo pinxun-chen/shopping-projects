@@ -13,7 +13,10 @@ const OrderListPage = () => {
       const result = await res.json();
 
       if (res.status === 200) {
-        setOrders(result.data || []);
+        const sortedOrders = [...(result.data || [])].sort(
+          (a, b) => new Date(b.orderTime) - new Date(a.orderTime)
+        );
+        setOrders(sortedOrders);
       } else {
         console.error('訂單載入失敗:', result.message);
       }

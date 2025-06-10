@@ -57,53 +57,53 @@ function ProductSalesChart() {
 
         <h2 className="text-xl font-bold mb-4">商品銷售圖表</h2>
 
-      {/* 搜尋欄位 */}
-      <div className="mb-4">
-        <input
-          type="text"
-          placeholder="搜尋"
-          value={searchTerm}
-          onChange={handleSearch}
-          className="border px-3 py-2 rounded w-full max-w-sm"
-        />
-      </div>
-
-      <div className="flex justify-end mb-2">
-        <button
-          onClick={() => navigate('/admin/report')}
-          className="ml-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          返回報表
-        </button>
-      </div>
-
-      {/* 圖表 */}
-      <ResponsiveContainer width="100%" height={400}>
-        <BarChart
-          data={chartData}
-          layout="vertical"
-          margin={{ top: 20, right: 30, left: 100, bottom: 5 }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis type="number" />
-          <YAxis
-            dataKey="productName"
-            type="category"
-            width={150}
-            tick={{ fontSize: 16 }}
-          />
-          <Tooltip />
-          <Legend />
-          {sizes.map((size, index) => (
-            <Bar
-              key={size}
-              dataKey={size}
-              name={`尺寸 ${size}`}
-              fill={`hsl(${index * 60}, 70%, 60%)`}
+        {/* 搜尋欄位 */}
+        <div className="mb-4">
+            <input
+            type="text"
+            placeholder="搜尋"
+            value={searchTerm}
+            onChange={handleSearch}
+            className="border px-3 py-2 rounded w-full max-w-sm"
             />
-          ))}
-        </BarChart>
-      </ResponsiveContainer>
+        </div>
+
+        <div className="flex justify-end mb-2">
+            <button
+            onClick={() => navigate('/admin/report')}
+            className="ml-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            >
+            返回報表
+            </button>
+        </div>
+
+        {/* 圖表 */}
+        <ResponsiveContainer width="100%" height={400}>
+            <BarChart
+            data={chartData}
+            layout="vertical"
+            margin={{ top: 20, right: 30, left: 100, bottom: 5 }}
+            >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis type="number" />
+            <YAxis
+                dataKey="productName"
+                type="category"
+                width={150}
+                tick={{ fontSize: 16 }}
+            />
+            <Tooltip />
+            <Legend />
+            {sizes.map((size, index) => (
+                <Bar
+                key={size}
+                dataKey={size}
+                name={`尺寸 ${size}`}
+                fill={`hsl(${index * 60}, 70%, 60%)`}
+                />
+            ))}
+            </BarChart>
+        </ResponsiveContainer>
     </div>
   );
 }

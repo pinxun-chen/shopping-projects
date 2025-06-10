@@ -56,11 +56,11 @@ function App() {
   return (
     <Router>
       {/* 導覽列 */}
-      <nav className="bg-white border-b p-4 flex justify-between items-center shadow-sm">
+      <nav className="bg-white border-b p-4 flex flex-col md:flex-row md:justify-between md:items-center gap-y-2 gap-x-4 shadow-sm flex-wrap">
         <div className="text-xl font-bold">
           <Link to="/">Home</Link>
         </div>
-        <div className="space-x-4">
+        <div className="flex flex-wrap gap-x-4 justify-center md:justify-start">
           {!loggedIn ? (
             <Link to="/products" className="hover:underline">所有商品</Link>
           ):(
@@ -82,7 +82,7 @@ function App() {
             </>
           )}
         </div>
-        <div className="space-x-2">
+        <div className="flex flex-wrap gap-x-2 justify-center md:justify-end">
           {!loggedIn ? (
             <>
               <Link to="/login" className="border px-2 py-1 rounded">登入會員</Link>
