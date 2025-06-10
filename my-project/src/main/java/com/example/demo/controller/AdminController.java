@@ -111,6 +111,7 @@ public class AdminController {
         } else {
             return ResponseEntity.status(404).body(ApiResponse.error(404, "查無此訂單"));
         }
+       
     }
     
     // 商品銷售報表
