@@ -1,65 +1,29 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const [hotProducts, setHotProducts] = useState([]);
-  const [latestProducts, setLatestProducts] = useState([]);
-
-  useEffect(() => {
-    fetch("/api/products/hot") // 熱銷商品 API
-      .then((res) => res.json())
-      .then((data) => setHotProducts(data.data || []));
-
-    fetch("/api/products/latest") // 最新上架商品 API
-      .then((res) => res.json())
-      .then((data) => setLatestProducts(data.data || []));
-  }, []);
 
   return (
     <div className="flex flex-col items-center">
-      {/* Hero Banner */}
-      <div className="w-full h-[300px] bg-cover bg-center bg-[url('/banner.jpg')] flex items-center justify-center">
-        <h1 className="text-white text-4xl md:text-5xl font-bold drop-shadow-lg">歡迎來到我的商城</h1>
+      {/* Hero Banner with Illustration as Background */}
+      <div className="relative w-full h-[600px] flex items-center justify-center bg-cover bg-center brightness-110" style={{ backgroundImage: "url('/images/hero-illustration.png')" }}>
+        <div className="absolute inset-0 bg-black bg-opacity-10 pointer-events-none"></div>
+        <h1 className="text-white text-4xl md:text-5xl font-bold drop-shadow-lg z-10 relative">歡迎來到我的商城</h1>
       </div>
 
       {/* 分類快速入口 */}
       <div className="w-full max-w-6xl px-4 py-8 grid grid-cols-2 md:grid-cols-4 gap-4">
-        {["男裝", "女裝", "配件", "特價"].map((category, idx) => (
+        {['衣服', '褲子', '鞋子', '飾品'].map((category, idx) => (
           <div
             key={idx}
             className="bg-gray-100 hover:bg-gray-200 p-6 rounded-xl text-center shadow cursor-pointer"
-            onClick={() => navigate(`/category/${category}`)}
+            onClick={() => navigate(`/products?category=${category}`)}
           >
             <p className="text-xl font-semibold">{category}</p>
           </div>
         ))}
       </div>
-
-      {/* 熱銷商品 */}
-      <section className="w-full max-w-6xl px-4 py-6">
-        <h2 className="text-2xl font-bold mb-4">🔥 熱銷推薦</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {hotProducts.map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
-        </div>
-      </section>
-
-      {/* 最新商品 */}
-      <section className="w-full max-w-6xl px-4 py-6">
-        <h2 className="text-2xl font-bold mb-4">🆕 最新上架</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {latestProducts.map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="w-full bg-gray-800 text-white text-center py-4 mt-10">
-        <p>&copy; 2025 品勛商城 All rights reserved.</p>
-      </footer>
     </div>
   );
 };
