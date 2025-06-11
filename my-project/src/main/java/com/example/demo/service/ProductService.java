@@ -15,4 +15,5 @@ public interface ProductService {
     List<CategoryDto> getAllCategories();
     // 查詢單一商品和尺寸
     ProductDetailDto getProductDetailWithVariants(Integer productId);
+    List<ProductDto> getProductsByCategoryName(String categoryName);
 }

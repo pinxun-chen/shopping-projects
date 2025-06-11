@@ -1,6 +1,7 @@
 package com.example.demo.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -16,6 +17,7 @@ import com.example.demo.model.entity.ProductVariant;
 import com.example.demo.repository.CategoryRepository;
 import com.example.demo.repository.ProductRepository;
 import com.example.demo.repository.ProductVariantRepository;
+import com.example.demo.service.CategoryService;
 import com.example.demo.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final ProductVariantRepository variantRepository;
+    private final CategoryService categoryService;
     private final ModelMapper modelMapper;
 
     @Override
@@ -100,4 +103,19 @@ public class ProductServiceImpl implements ProductService {
 
         return dto;
     }
+    
+    @Override
+    public List<ProductDto> getProductsByCategoryName(String categoryName) {
+        Optional<Category> categoryOpt = categoryService.getCategoryByName(categoryName);
+        if (categoryOpt.isEmpty()) {
+            throw new RuntimeException("分類不存在");
+        }
+
+        List<Product> products = productRepository.findByCategory(categoryOpt.get());
+        return products.stream()
+                       .map(p -> modelMapper.map(p, ProductDto.class))
+                       .toList();
+    }
+
+
 }

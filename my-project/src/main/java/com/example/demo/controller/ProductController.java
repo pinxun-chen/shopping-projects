@@ -72,5 +72,13 @@ public class ProductController {
         return ResponseEntity.ok(ApiResponse.success("刪除成功", null));
     }
     
+    // 根據分類名稱查詢商品（首頁用）
+    @GetMapping("/category/name/{categoryName}")
+    public ResponseEntity<ApiResponse<List<ProductDto>>> getByCategoryName(@PathVariable String categoryName) {
+        List<ProductDto> products = productService.getProductsByCategoryName(categoryName);
+        String message = products.isEmpty() ? "查無此分類的商品" : "查詢成功";
+        return ResponseEntity.ok(ApiResponse.success(message, products));
+    }
+    
 }
 
