@@ -52,14 +52,16 @@ public class ReviewServiceImpl implements ReviewService {
     public List<ReviewResponseDto> getReviewsByProductId(Integer productId) {
         List<ProductReview> reviews = reviewRepository.findByProductIdWithUser(productId);
         return reviews.stream()
-    		.map(r -> new ReviewResponseDto(
-    			    r.getUser().getUserId(),
-    			    r.getRating(),
-    			    r.getComment(),
-    			    r.getUser().getUsername(),
-    			    r.getCreatedAt()
-    		))
-            .collect(Collectors.toList());
+			.map(r -> new ReviewResponseDto(
+				    r.getId(),                             
+				    r.getUser().getUserId(),
+				    r.getRating(),
+				    r.getComment(),
+				    r.getUser().getUsername(),
+				    r.getCreatedAt(),
+				    r.getReply()
+			))
+        	.collect(Collectors.toList());
     }
 
 	@Override
