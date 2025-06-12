@@ -73,6 +73,7 @@ function App() {
               )}
               {role === "ADMIN" && (
                 <>
+                  <Link to="/products" className="hover:underline">所有商品</Link>
                   <Link to="/admin/products" className="hover:underline">商品管理</Link>
                   <Link to="/admin/orders" className="hover:underline">訂單管理</Link>
                   <Link to="/admin/users" className="hover:underline">會員管理</Link>

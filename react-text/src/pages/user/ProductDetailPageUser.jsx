@@ -84,6 +84,25 @@ function ProductDetailPageUser() {
     }
   };
 
+  const handleReplyDelete = async (reviewId) => {
+    if (!window.confirm('確定要刪除這則回覆嗎？')) return;
+    try {
+      const res = await fetch(`/api/review/reply/${reviewId}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      const data = await res.json();
+      if (data.status === 200) {
+        alert('回覆已刪除');
+        fetchReviews();
+      } else {
+        alert(data.message);
+      }
+    } catch (err) {
+      alert('刪除失敗: ' + err.message);
+    }
+  };
+
   const handleAddToCart = async () => {
     if (!selectedVariantId) return alert('請選擇尺寸');
     if (selectedStock <= 0) return alert('該尺寸已售完');
@@ -233,7 +252,7 @@ function ProductDetailPageUser() {
                 <div className="text-sm text-gray-700 mb-2">{r.comment}</div>
 
                 {r.reply && (
-                  <div className="bg-white border-l-4 border-blue-500 p-3 text-sm text-gray-600 mt-2">
+                  <div className="text-sm text-blue-700 bg-blue-50 p-2 rounded mb-2">
                     管理員回覆：{r.reply}
                   </div>
                 )}
@@ -268,12 +287,22 @@ function ProductDetailPageUser() {
                       value={replyMap[r.id] || ''}
                       onChange={(e) => handleReplyChange(r.id, e.target.value)}
                     />
-                    <button
-                      className="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700"
-                      onClick={() => handleReplySubmit(r.id)}
-                    >
-                      回覆
-                    </button>
+                    <div className="flex space-x-2">
+                      <button
+                        className="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700"
+                        onClick={() => handleReplySubmit(r.id)}
+                      >
+                        儲存回覆
+                      </button>
+                      {r.reply && (
+                        <button
+                          className="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600"
+                          onClick={() => handleReplyDelete(r.id)}
+                        >
+                          刪除回覆
+                        </button>
+                      )}
+                    </div>
                   </div>
                 )}
               </li>
