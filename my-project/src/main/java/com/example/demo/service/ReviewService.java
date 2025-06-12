@@ -11,4 +11,6 @@ public interface ReviewService {
     List<ReviewResponseDto> getReviewsByProductId(Integer productId);
     
     void deleteReview(Integer userId, Integer productId);
+    
+    boolean replyToReview(Integer reviewId, String reply);
 }

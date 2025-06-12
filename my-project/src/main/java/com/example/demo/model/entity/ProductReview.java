@@ -45,4 +45,7 @@ public class ProductReview {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+    
+    @Column(length = 1000)
+    private String reply;
 }

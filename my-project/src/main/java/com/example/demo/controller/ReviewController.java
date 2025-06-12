@@ -1,7 +1,9 @@
 package com.example.demo.controller;
 
+import com.example.demo.model.dto.ReplyRequestDto;
 import com.example.demo.model.dto.ReviewDto;
 import com.example.demo.model.dto.ReviewResponseDto;
+import com.example.demo.model.dto.UserCert;
 import com.example.demo.response.ApiResponse;
 import com.example.demo.service.ReviewService;
 
@@ -49,6 +51,25 @@ public class ReviewController {
 
         reviewService.deleteReview(userId, productId);
         return ResponseEntity.ok(new ApiResponse<>(200, "刪除成功", null));
+    }
+    
+    @PutMapping("/reply/{reviewId}")
+    public ResponseEntity<ApiResponse<Void>> replyToReview(
+            @PathVariable Integer reviewId,
+            @RequestBody ReplyRequestDto request,
+            HttpSession session) {
+
+        UserCert cert = (UserCert) session.getAttribute("userCert");
+        if (cert == null || !"ADMIN".equals(cert.getRole())) {
+            return ResponseEntity.status(403).body(ApiResponse.error(403, "僅限管理員回覆評價"));
+        }
+
+        boolean success = reviewService.replyToReview(reviewId, request.getReply());
+        if (success) {
+            return ResponseEntity.ok(ApiResponse.success("回覆成功", null));
+        } else {
+            return ResponseEntity.status(404).body(ApiResponse.error(404, "找不到該評價"));
+        }
     }
 
 

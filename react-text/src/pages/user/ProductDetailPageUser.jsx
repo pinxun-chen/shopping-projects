@@ -11,7 +11,9 @@ function ProductDetailPageUser() {
   const [comment, setComment] = useState('');
   const [loading, setLoading] = useState(false);
   const [currentUserId, setCurrentUserId] = useState(null);
+  const [currentUserRole, setCurrentUserRole] = useState(null);
   const [editing, setEditing] = useState(false);
+  const [replyMap, setReplyMap] = useState({});
 
   const fetchProduct = async () => {
     try {
@@ -48,9 +50,37 @@ function ProductDetailPageUser() {
       const data = await res.json();
       if (data.status === 200) {
         setCurrentUserId(data.data.userId);
+        setCurrentUserRole(data.data.role);
       }
     } catch (err) {
       console.warn('無法取得使用者資訊', err);
+    }
+  };
+
+  const handleReplyChange = (reviewId, text) => {
+    setReplyMap((prev) => ({ ...prev, [reviewId]: text }));
+  };
+
+  const handleReplySubmit = async (reviewId) => {
+    const reply = replyMap[reviewId];
+    if (!reply) return;
+    try {
+      const res = await fetch(`/api/review/reply/${reviewId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ reply })
+      });
+      const data = await res.json();
+      if (data.status === 200) {
+        alert('回覆成功');
+        setReplyMap((prev) => ({ ...prev, [reviewId]: '' }));
+        fetchReviews();
+      } else {
+        alert(data.message);
+      }
+    } catch (err) {
+      alert('回覆失敗: ' + err.message);
     }
   };
 
@@ -194,13 +224,19 @@ function ProductDetailPageUser() {
           <p className="text-gray-500">目前尚無評價</p>
         ) : (
           <ul className="space-y-3">
-            {reviews.map((r, index) => (
+            {reviews.map((r) => (
               <li key={`${r.userId}-${r.createdAt}`} className="border p-4 rounded bg-gray-50">
                 <div className="text-xs text-gray-500 mb-1">
                   👤 {r.username} ‧ {new Date(r.createdAt).toLocaleString()}
                 </div>
                 <div className="text-yellow-500 font-medium">⭐️ {r.rating} 分</div>
-                <div className="text-sm text-gray-700">{r.comment}</div>
+                <div className="text-sm text-gray-700 mb-2">{r.comment}</div>
+
+                {r.reply && (
+                  <div className="bg-white border-l-4 border-blue-500 p-3 text-sm text-gray-600 mt-2">
+                    管理員回覆：{r.reply}
+                  </div>
+                )}
 
                 {r.userId === currentUserId && (
                   <div className="mt-2 space-x-3 text-right">
@@ -222,42 +258,62 @@ function ProductDetailPageUser() {
                     </button>
                   </div>
                 )}
+
+                {currentUserRole === 'ADMIN' && (
+                  <div className="mt-4">
+                    <textarea
+                      rows="2"
+                      className="border w-full px-3 py-2 mb-2 rounded"
+                      placeholder="輸入回覆內容"
+                      value={replyMap[r.id] || ''}
+                      onChange={(e) => handleReplyChange(r.id, e.target.value)}
+                    />
+                    <button
+                      className="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700"
+                      onClick={() => handleReplySubmit(r.id)}
+                    >
+                      回覆
+                    </button>
+                  </div>
+                )}
               </li>
             ))}
           </ul>
         )}
 
-        <div className="mt-8">
-          <h4 className="font-semibold mb-2">我要評價</h4>
-          <label className="block mb-1">點選星星：</label>
-          <div className="flex justify-center space-x-2 text-4xl mb-4">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <span
-                key={star}
-                onClick={() => setRating(star)}
-                className={`cursor-pointer ${star <= rating ? 'text-yellow-400' : 'text-gray-300'}`}
-              >
-                ★
-              </span>
-            ))}
+        {currentUserRole !== 'ADMIN' && (
+          <div className="mt-8">
+            <h4 className="font-semibold mb-2">我要評價</h4>
+            <label className="block mb-1">點選星星：</label>
+            <div className="flex justify-center space-x-2 text-4xl mb-4">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <span
+                  key={star}
+                  onClick={() => setRating(star)}
+                  className={`cursor-pointer ${star <= rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                >
+                  ★
+                </span>
+              ))}
+            </div>
+
+            <textarea
+              rows="3"
+              className="border w-full px-3 py-2 mb-2 rounded"
+              placeholder="留下您的評價（可選填）"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+            />
+
+            <button
+              onClick={handleSubmitReview}
+              disabled={loading || rating === 0}
+              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            >
+              {loading ? '提交中...' : editing ? '更新評價' : '送出評價'}
+            </button>
           </div>
-
-          <textarea
-            rows="3"
-            className="border w-full px-3 py-2 mb-2 rounded"
-            placeholder="留下您的評價（可選填）"
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-          />
-
-          <button
-            onClick={handleSubmitReview}
-            disabled={loading || rating === 0}
-            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-          >
-            {loading ? '提交中...' : editing ? '更新評價' : '送出評價'}
-          </button>
-        </div>
+        )}
       </div>
     </div>
   );

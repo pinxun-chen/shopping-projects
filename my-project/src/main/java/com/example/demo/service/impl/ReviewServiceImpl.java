@@ -68,4 +68,16 @@ public class ReviewServiceImpl implements ReviewService {
 	    review.ifPresent(reviewRepository::delete);
 	}
 
+	@Override
+	public boolean replyToReview(Integer reviewId, String reply) {
+		Optional<ProductReview> optionalReview = reviewRepository.findById(reviewId);
+	    if (optionalReview.isPresent()) {
+	        ProductReview review = optionalReview.get();
+	        review.setReply(reply);
+	        reviewRepository.save(review);
+	        return true;
+	    }
+	    return false;
+	}
+
 }
