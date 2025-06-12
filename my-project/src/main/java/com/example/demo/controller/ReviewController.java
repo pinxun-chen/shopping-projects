@@ -1,7 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.dto.ReviewDto;
-import com.example.demo.model.entity.ProductReview;
+import com.example.demo.model.dto.ReviewResponseDto;
 import com.example.demo.response.ApiResponse;
 import com.example.demo.service.ReviewService;
 
@@ -33,8 +33,23 @@ public class ReviewController {
     }
 
     @GetMapping("/{productId}")
-    public ResponseEntity<ApiResponse<List<ProductReview>>> getReviewsByProduct(@PathVariable Integer productId) {
-        List<ProductReview> reviews = reviewService.getReviewsByProductId(productId);
-        return ResponseEntity.ok(new ApiResponse<>(200, "查詢成功", reviews));
+    public ResponseEntity<ApiResponse<List<ReviewResponseDto>>> getReviewsByProduct(@PathVariable Integer productId) {
+        List<ReviewResponseDto> reviewDtos = reviewService.getReviewsByProductId(productId);
+        return ResponseEntity.ok(new ApiResponse<>(200, "查詢成功", reviewDtos));
     }
+    
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<ApiResponse<String>> deleteReview(
+            @PathVariable Integer productId,
+            HttpSession session) {
+        Integer userId = (Integer) session.getAttribute("userId");
+        if (userId == null) {
+            return ResponseEntity.status(401).body(new ApiResponse<>(401, "未登入", null));
+        }
+
+        reviewService.deleteReview(userId, productId);
+        return ResponseEntity.ok(new ApiResponse<>(200, "刪除成功", null));
+    }
+
+
 }

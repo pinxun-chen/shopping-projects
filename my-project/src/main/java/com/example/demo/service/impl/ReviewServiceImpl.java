@@ -1,6 +1,7 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.model.dto.ReviewDto;
+import com.example.demo.model.dto.ReviewResponseDto;
 import com.example.demo.model.entity.Product;
 import com.example.demo.model.entity.ProductReview;
 import com.example.demo.model.entity.User;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,7 +49,23 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public List<ProductReview> getReviewsByProductId(Integer productId) {
-        return reviewRepository.findByProductId(productId);
+    public List<ReviewResponseDto> getReviewsByProductId(Integer productId) {
+        List<ProductReview> reviews = reviewRepository.findByProductIdWithUser(productId);
+        return reviews.stream()
+    		.map(r -> new ReviewResponseDto(
+    			    r.getUser().getUserId(),
+    			    r.getRating(),
+    			    r.getComment(),
+    			    r.getUser().getUsername(),
+    			    r.getCreatedAt()
+    		))
+            .collect(Collectors.toList());
     }
+
+	@Override
+	public void deleteReview(Integer userId, Integer productId) {
+		Optional<ProductReview> review = reviewRepository.findByProductIdAndUser_UserId(productId, userId);
+	    review.ifPresent(reviewRepository::delete);
+	}
+
 }
