@@ -134,6 +134,7 @@ public class UserController {
         try {
             UserCert cert = certService.getCert(username, password);
             session.setAttribute("userCert", cert);
+            session.setAttribute("userId", cert.getUserId());
 
             // 將 UserCert 轉成 UserDto（給前端用）
             UserDto dto = new UserDto();
