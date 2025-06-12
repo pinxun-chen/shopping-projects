@@ -53,9 +53,9 @@ public class ReviewController {
         return ResponseEntity.ok(new ApiResponse<>(200, "刪除成功", null));
     }
     
-    @PutMapping("/reply/{reviewId}")
+    @PutMapping("/reply/{Id}")
     public ResponseEntity<ApiResponse<Void>> replyToReview(
-            @PathVariable Integer reviewId,
+            @PathVariable Integer Id,
             @RequestBody ReplyRequestDto request,
             HttpSession session) {
 
@@ -64,7 +64,7 @@ public class ReviewController {
             return ResponseEntity.status(403).body(ApiResponse.error(403, "僅限管理員回覆評價"));
         }
 
-        boolean success = reviewService.replyToReview(reviewId, request.getReply());
+        boolean success = reviewService.replyToReview(Id, request.getReply());
         if (success) {
             return ResponseEntity.ok(ApiResponse.success("回覆成功", null));
         } else {
