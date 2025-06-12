@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:8082/users';
+const API_BASE = 'http://localhost:8082/api/users';
 
 // 工具方法：統一解析 JSON（避免 HTML 回傳時報錯）
 const safeJson = async (res) => {
