@@ -82,4 +82,26 @@ public class ReviewServiceImpl implements ReviewService {
 	    return false;
 	}
 
+	@Override
+	public boolean updateReply(Integer reviewId, String reply) {
+		Optional<ProductReview> optional = reviewRepository.findById(reviewId);
+	    if (optional.isEmpty()) return false;
+
+	    ProductReview review = optional.get();
+	    review.setReply(reply);
+	    reviewRepository.save(review);
+	    return true;
+	}
+
+	@Override
+	public boolean deleteReply(Integer reviewId) {
+		Optional<ProductReview> optional = reviewRepository.findById(reviewId);
+	    if (optional.isEmpty()) return false;
+
+	    ProductReview review = optional.get();
+	    review.setReply(null);
+	    reviewRepository.save(review);
+	    return true;
+	}
+
 }

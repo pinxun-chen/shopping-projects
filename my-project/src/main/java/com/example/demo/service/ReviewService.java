@@ -13,4 +13,8 @@ public interface ReviewService {
     void deleteReview(Integer userId, Integer productId);
     
     boolean replyToReview(Integer reviewId, String reply);
+    
+    boolean updateReply(Integer reviewId, String reply);
+    
+    boolean deleteReply(Integer reviewId);
 }
