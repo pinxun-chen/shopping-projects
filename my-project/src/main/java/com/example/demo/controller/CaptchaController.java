@@ -15,7 +15,7 @@ public class CaptchaController {
 
     @GetMapping("/api/captcha")
     public void getCaptcha(HttpServletResponse response, HttpSession session) throws IOException {
-        String code = CaptchaUtil.generateCode(5); // 產生 5 位數驗證碼
+        String code = CaptchaUtil.generateCode(4); // 產生 4 位數驗證碼
         session.setAttribute("captcha", code); // 存到 session
 
         BufferedImage image = CaptchaUtil.generateImage(code);

@@ -49,7 +49,7 @@ function LoginPage({ onLogin, loggedIn }) {
       }
     } else {
       setError(result.message || '登入失敗');
-      refreshCaptcha(); // 失敗後刷新驗證碼
+      refreshCaptcha(); // 刷新驗證碼
     }
   };
 
@@ -108,8 +108,24 @@ function LoginPage({ onLogin, loggedIn }) {
             src={captchaUrl}
             alt="驗證碼"
             onClick={refreshCaptcha}
-            style={{ marginLeft: '10px', height: '40px', cursor: 'pointer' }}
+            style={{ height: '40px', marginLeft: '10px', cursor: 'pointer', border: '1px solid #ccc' }}
           />
+          <button
+            type="button"
+            onClick={refreshCaptcha}
+            title="重新整理驗證碼"
+            style={{
+              marginLeft: '6px',
+              backgroundColor: '#eee',
+              border: 'none',
+              borderRadius: '4px',
+              padding: '6px 10px',
+              cursor: 'pointer',
+              fontSize: '12px'
+            }}
+          >
+            🔄
+          </button>
         </div>
 
         <button
