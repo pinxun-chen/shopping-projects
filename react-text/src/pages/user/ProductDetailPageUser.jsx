@@ -14,6 +14,7 @@ function ProductDetailPageUser() {
   const [currentUserRole, setCurrentUserRole] = useState(null);
   const [editing, setEditing] = useState(false);
   const [replyMap, setReplyMap] = useState({});
+  const [hasReviewed, setHasReviewed] = useState(false);
 
   const fetchProduct = async () => {
     try {
@@ -29,12 +30,19 @@ function ProductDetailPageUser() {
     }
   };
 
+  const checkIfUserHasReviewed = (reviewsList) => {
+    if (!currentUserId) return;
+    const reviewed = reviewsList.some(r => r.userId === currentUserId);
+    setHasReviewed(reviewed);
+  };
+
   const fetchReviews = async () => {
     try {
       const res = await fetch(`/api/review/${id}`);
       const data = await res.json();
       if (data.status === 200) {
         setReviews(data.data);
+        checkIfUserHasReviewed(data.data);
       } else {
         console.warn(data.message);
       }
@@ -85,7 +93,7 @@ function ProductDetailPageUser() {
   };
 
   const handleReplyDelete = async (reviewId) => {
-    if (!window.confirm('確定要刪除這則回覆嗎？')) return;
+    if (!window.confirm('確定要刪除回覆嗎？')) return;
     try {
       const res = await fetch(`/api/review/reply/${reviewId}`, {
         method: 'DELETE',
@@ -130,7 +138,18 @@ function ProductDetailPageUser() {
   };
 
   const handleSubmitReview = async () => {
-    if (!rating) return alert('請選擇評分');
+    // console.log('目前評分:', rating);
+
+    if (!editing && hasReviewed) {
+      alert('您已評價過此商品');
+      return;
+    }
+    
+    if (rating < 1 || rating > 5) {
+      alert('請選擇評分');
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await fetch('/api/review', {
@@ -156,6 +175,7 @@ function ProductDetailPageUser() {
     }
   };
 
+
   const handleDeleteReview = async () => {
     if (!window.confirm('確定要刪除這則評價嗎？')) return;
     try {
@@ -180,9 +200,14 @@ function ProductDetailPageUser() {
 
   useEffect(() => {
     fetchProduct();
-    fetchReviews();
     fetchCurrentUser();
   }, [id]);
+
+  useEffect(() => {
+    if (currentUserId !== null) {
+      fetchReviews();
+    }
+  }, [currentUserId]);
 
   useEffect(() => {
     if (!selectedVariantId || !product) {
@@ -287,7 +312,7 @@ function ProductDetailPageUser() {
                       value={replyMap[r.id] || ''}
                       onChange={(e) => handleReplyChange(r.id, e.target.value)}
                     />
-                    <div className="flex space-x-2">
+                    <div className="flex justify-center space-x-2">
                       <button
                         className="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700"
                         onClick={() => handleReplySubmit(r.id)}
@@ -334,13 +359,27 @@ function ProductDetailPageUser() {
               onChange={(e) => setComment(e.target.value)}
             />
 
-            <button
-              onClick={handleSubmitReview}
-              disabled={loading || rating === 0}
-              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-            >
-              {loading ? '提交中...' : editing ? '更新評價' : '送出評價'}
-            </button>
+            <div className="flex justify-center space-x-4 mt-2">
+              <button
+                onClick={handleSubmitReview}
+                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+              >
+                {loading ? '提交中...' : editing ? '更新評價' : '送出評價'}
+              </button>
+              
+              {editing && (
+                <button
+                  onClick={() => {
+                    setEditing(false);
+                    setComment('');
+                    setRating(0);
+                  }}
+                  className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
+                >
+                  取消編輯
+                </button>
+              )}
+            </div>
           </div>
         )}
       </div>
