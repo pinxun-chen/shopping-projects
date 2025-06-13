@@ -11,14 +11,20 @@ const safeJson = async (res) => {
   }
 };
 
-export const login = async (username, password) => {
-  const res = await fetch(`${API_BASE}/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({ username, password }),
-    credentials: 'include'
-  });
-  return await safeJson(res);
+export const login = async (username, password, captcha) => {
+  try {
+    const res = await fetch("http://localhost:8082/api/users/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ username, password, captcha }),
+    });
+
+    const result = await res.json();
+    return result;
+  } catch (err) {
+    return { status: 500, message: "伺服器錯誤" };
+  }
 };
 
 export const register = async (username, password, email) => {
