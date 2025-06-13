@@ -138,15 +138,12 @@ function ProductDetailPageUser() {
   };
 
   const handleSubmitReview = async () => {
-    // console.log('目前評分:', rating);
-
-    if (!editing && hasReviewed) {
-      alert('您已評價過此商品');
+    if (!rating) {
+      alert('請選擇評分');
       return;
     }
-    
-    if (rating < 1 || rating > 5) {
-      alert('請選擇評分');
+    if (!editing && hasReviewed) {
+      alert('您已評價過此商品');
       return;
     }
 
@@ -174,7 +171,6 @@ function ProductDetailPageUser() {
       setLoading(false);
     }
   };
-
 
   const handleDeleteReview = async () => {
     if (!window.confirm('確定要刪除這則評價嗎？')) return;
@@ -224,13 +220,11 @@ function ProductDetailPageUser() {
     <div className="max-w-4xl mx-auto p-4">
       <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-10">
         <img src={product.imageUrl} alt={product.name} className="w-64 h-64 object-cover rounded shadow" />
-
         <div className="flex-1">
           <h2 className="text-2xl font-bold mb-2">{product.name}</h2>
           <p className="text-lg mb-1">價格: <span className="font-semibold">${product.price}</span></p>
           <p className="text-gray-600 mb-1">分類: {product.categoryName}</p>
           <p className="text-gray-600 mb-4">{product.description}</p>
-
           <div className="mb-4">
             <label className="block mb-1 font-medium">選擇尺寸：</label>
             <select
@@ -246,7 +240,6 @@ function ProductDetailPageUser() {
               ))}
             </select>
           </div>
-
           <button
             onClick={handleAddToCart}
             disabled={!selectedVariantId || selectedStock <= 0}
@@ -263,7 +256,6 @@ function ProductDetailPageUser() {
 
       <div className="mt-10 border-t pt-6">
         <h3 className="text-xl font-bold mb-4">商品評價</h3>
-
         {reviews.length === 0 ? (
           <p className="text-gray-500">目前尚無評價</p>
         ) : (
@@ -275,13 +267,11 @@ function ProductDetailPageUser() {
                 </div>
                 <div className="text-yellow-500 font-medium">⭐️ {r.rating} 分</div>
                 <div className="text-sm text-gray-700 mb-2">{r.comment}</div>
-
                 {r.reply && (
                   <div className="text-sm text-blue-700 bg-blue-50 p-2 rounded mb-2">
-                    管理員回覆：{r.reply}
+                    業者已回覆：{r.reply}
                   </div>
                 )}
-
                 {r.userId === currentUserId && (
                   <div className="mt-2 space-x-3 text-right">
                     <button
@@ -302,7 +292,6 @@ function ProductDetailPageUser() {
                     </button>
                   </div>
                 )}
-
                 {currentUserRole === 'ADMIN' && (
                   <div className="mt-4">
                     <textarea
@@ -317,7 +306,7 @@ function ProductDetailPageUser() {
                         className="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700"
                         onClick={() => handleReplySubmit(r.id)}
                       >
-                        儲存回覆
+                        {r.reply ? '更新回覆' : '儲存回覆'}
                       </button>
                       {r.reply && (
                         <button
@@ -333,54 +322,6 @@ function ProductDetailPageUser() {
               </li>
             ))}
           </ul>
-        )}
-
-        {currentUserRole !== 'ADMIN' && (
-          <div className="mt-8">
-            <h4 className="font-semibold mb-2">我要評價</h4>
-            <label className="block mb-1">點選星星：</label>
-            <div className="flex justify-center space-x-2 text-4xl mb-4">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <span
-                  key={star}
-                  onClick={() => setRating(star)}
-                  className={`cursor-pointer ${star <= rating ? 'text-yellow-400' : 'text-gray-300'}`}
-                >
-                  ★
-                </span>
-              ))}
-            </div>
-
-            <textarea
-              rows="3"
-              className="border w-full px-3 py-2 mb-2 rounded"
-              placeholder="留下您的評價（可選填）"
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-            />
-
-            <div className="flex justify-center space-x-4 mt-2">
-              <button
-                onClick={handleSubmitReview}
-                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-              >
-                {loading ? '提交中...' : editing ? '更新評價' : '送出評價'}
-              </button>
-              
-              {editing && (
-                <button
-                  onClick={() => {
-                    setEditing(false);
-                    setComment('');
-                    setRating(0);
-                  }}
-                  className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
-                >
-                  取消編輯
-                </button>
-              )}
-            </div>
-          </div>
         )}
       </div>
     </div>
