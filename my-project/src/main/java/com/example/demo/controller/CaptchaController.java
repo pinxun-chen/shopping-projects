@@ -22,4 +22,5 @@ public class CaptchaController {
         response.setContentType("image/png");
         ImageIO.write(image, "png", response.getOutputStream());
     }
+    
 }
