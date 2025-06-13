@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.exception.CertException;
 import com.example.demo.model.dto.ChangePasswordRequestDto;
+import com.example.demo.model.dto.LoginRequestDto;
 import com.example.demo.model.dto.RegisterRequestDto;
 import com.example.demo.model.dto.UserCert;
 import com.example.demo.model.dto.UserDto;
@@ -128,21 +129,36 @@ public class UserController {
     
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<UserDto>> login(
-            @RequestParam String username,
-            @RequestParam String password,
+            @RequestBody LoginRequestDto loginRequest,
             HttpSession session) {
+
+        // 從 request 中取得欄位
+        String username = loginRequest.getUsername();
+        String password = loginRequest.getPassword();
+        String captcha = loginRequest.getCaptcha();
+
+        // 1. 驗證 captcha
+        String expectedCaptcha = (String) session.getAttribute("captcha");
+        if (expectedCaptcha == null || !expectedCaptcha.equalsIgnoreCase(captcha)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error(400, "驗證碼錯誤"));
+        }
+
         try {
+            // 2. 驗證帳號密碼
             UserCert cert = certService.getCert(username, password);
             session.setAttribute("userCert", cert);
             session.setAttribute("userId", cert.getUserId());
 
-            // 將 UserCert 轉成 UserDto（給前端用）
+            // 3. 將 UserCert 轉換成 UserDto 回傳
             UserDto dto = new UserDto();
             dto.setUserId(cert.getUserId());
             dto.setUsername(cert.getUsername());
             dto.setRole(cert.getRole());
 
             return ResponseEntity.ok(ApiResponse.success("登入成功", dto));
+
         } catch (CertException e) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
