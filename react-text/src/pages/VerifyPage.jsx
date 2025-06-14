@@ -9,7 +9,7 @@ function VerifyPage() {
   useEffect(() => {
     const token = searchParams.get('token');
     if (token) {
-      fetch(`http://localhost:8082/users/verify?token=${token}`)
+      fetch(`http://localhost:8082/api/users/verify?token=${token}`)
         .then(res => res.json())
         .then(result => {
           if (result.status === 200) {

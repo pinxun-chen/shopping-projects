@@ -16,6 +16,26 @@ function ProductDetailPageUser() {
   const [replyMap, setReplyMap] = useState({});
   const [hasReviewed, setHasReviewed] = useState(false);
 
+  useEffect(() => {
+    fetchProduct();
+    fetchCurrentUser();
+  }, [id]);
+
+  useEffect(() => {
+    if (currentUserId !== null) {
+      fetchReviews();
+    }
+  }, [currentUserId]);
+
+  useEffect(() => {
+    if (!selectedVariantId || !product) {
+      setSelectedStock(0);
+      return;
+    }
+    const variant = product.variants.find(v => v.variantId === Number(selectedVariantId));
+    setSelectedStock(variant?.stock || 0);
+  }, [selectedVariantId, product]);
+
   const fetchProduct = async () => {
     try {
       const res = await fetch(`/api/products/${id}`);
@@ -30,10 +50,17 @@ function ProductDetailPageUser() {
     }
   };
 
-  const checkIfUserHasReviewed = (reviewsList) => {
-    if (!currentUserId) return;
-    const reviewed = reviewsList.some(r => r.userId === currentUserId);
-    setHasReviewed(reviewed);
+  const fetchCurrentUser = async () => {
+    try {
+      const res = await fetch('/api/users/me', { credentials: 'include' });
+      const data = await res.json();
+      if (data.status === 200) {
+        setCurrentUserId(data.data.userId);
+        setCurrentUserRole(data.data.role);
+      }
+    } catch (err) {
+      console.warn('無法取得使用者資訊', err);
+    }
   };
 
   const fetchReviews = async () => {
@@ -43,26 +70,15 @@ function ProductDetailPageUser() {
       if (data.status === 200) {
         setReviews(data.data);
         checkIfUserHasReviewed(data.data);
-      } else {
-        console.warn(data.message);
       }
     } catch (err) {
       console.error('取得評價失敗:', err);
     }
   };
 
-  const fetchCurrentUser = async () => {
-    try {
-      const res = await fetch('/api/users/me', { credentials: 'include' });
-      if (!res.ok) return;
-      const data = await res.json();
-      if (data.status === 200) {
-        setCurrentUserId(data.data.userId);
-        setCurrentUserRole(data.data.role);
-      }
-    } catch (err) {
-      console.warn('無法取得使用者資訊', err);
-    }
+  const checkIfUserHasReviewed = (list) => {
+    if (!currentUserId) return;
+    setHasReviewed(list.some(r => r.userId === currentUserId));
   };
 
   const handleReplyChange = (reviewId, text) => {
@@ -114,7 +130,6 @@ function ProductDetailPageUser() {
   const handleAddToCart = async () => {
     if (!selectedVariantId) return alert('請選擇尺寸');
     if (selectedStock <= 0) return alert('該尺寸已售完');
-
     try {
       const res = await fetch('/api/cart/add', {
         method: 'POST',
@@ -146,7 +161,6 @@ function ProductDetailPageUser() {
       alert('您已評價過此商品');
       return;
     }
-
     setLoading(true);
     try {
       const res = await fetch('/api/review', {
@@ -194,30 +208,11 @@ function ProductDetailPageUser() {
     }
   };
 
-  useEffect(() => {
-    fetchProduct();
-    fetchCurrentUser();
-  }, [id]);
-
-  useEffect(() => {
-    if (currentUserId !== null) {
-      fetchReviews();
-    }
-  }, [currentUserId]);
-
-  useEffect(() => {
-    if (!selectedVariantId || !product) {
-      setSelectedStock(0);
-      return;
-    }
-    const variant = product.variants.find(v => v.variantId === Number(selectedVariantId));
-    setSelectedStock(variant?.stock || 0);
-  }, [selectedVariantId, product]);
-
   if (!product) return <div className="p-4">載入中...</div>;
 
   return (
     <div className="max-w-4xl mx-auto p-4">
+      {/* 商品資訊區 */}
       <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-10">
         <img src={product.imageUrl} alt={product.name} className="w-64 h-64 object-cover rounded shadow" />
         <div className="flex-1">
@@ -254,6 +249,7 @@ function ProductDetailPageUser() {
         </div>
       </div>
 
+      {/* 評價區與管理者功能 */}
       <div className="mt-10 border-t pt-6">
         <h3 className="text-xl font-bold mb-4">商品評價</h3>
         {reviews.length === 0 ? (
@@ -322,6 +318,50 @@ function ProductDetailPageUser() {
               </li>
             ))}
           </ul>
+        )}
+
+        {currentUserRole !== 'ADMIN' && (
+          <div className="mt-8">
+            <h4 className="font-semibold mb-2">我要評價</h4>
+            <div className="flex justify-center space-x-2 text-4xl mb-4">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <span
+                  key={star}
+                  onClick={() => setRating(star)}
+                  className={`cursor-pointer ${star <= rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                >
+                  ★
+                </span>
+              ))}
+            </div>
+            <textarea
+              rows="3"
+              className="border w-full px-3 py-2 mb-2 rounded"
+              placeholder="留下您的評價（可選填）"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+            />
+            <div className="flex justify-center space-x-4 mt-2">
+              <button
+                onClick={handleSubmitReview}
+                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+              >
+                {loading ? '提交中...' : editing ? '更新評價' : '送出評價'}
+              </button>
+              {editing && (
+                <button
+                  onClick={() => {
+                    setEditing(false);
+                    setComment('');
+                    setRating(0);
+                  }}
+                  className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
+                >
+                  取消編輯
+                </button>
+              )}
+            </div>
+          </div>
         )}
       </div>
     </div>

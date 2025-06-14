@@ -8,7 +8,6 @@ function LoginPage({ onLogin, loggedIn }) {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
-  const location = useLocation();
 
   useEffect(() => {
     const msg = localStorage.getItem('verifyMessage');
@@ -41,15 +40,10 @@ function LoginPage({ onLogin, loggedIn }) {
       localStorage.setItem("loggedIn", "true");
 
       onLogin();
-
-      if (role === "ADMIN") {
-        navigate("/admin");
-      } else {
-        navigate("/");
-      }
+      navigate(role === "ADMIN" ? "/admin" : "/");
     } else {
       setError(result.message || '登入失敗');
-      refreshCaptcha(); // 刷新驗證碼
+      refreshCaptcha();
     }
   };
 
@@ -59,92 +53,128 @@ function LoginPage({ onLogin, loggedIn }) {
 
   return (
     <div style={{
-      maxWidth: '400px',
-      margin: '4rem auto',
-      padding: '2rem',
-      border: '1px solid #ccc',
-      borderRadius: '8px',
-      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-      fontFamily: 'Arial'
+      maxWidth: '420px',
+      margin: '5rem auto',
+      padding: '2.5rem',
+      border: '1px solid #e0e0e0',
+      borderRadius: '12px',
+      boxShadow: '0 6px 20px rgba(0,0,0,0.08)',
+      backgroundColor: '#fff',
+      fontFamily: 'Arial, sans-serif'
     }}>
-      <h2 className="text-2xl font-bold mb-4 text-center text-blue-600">會員登入</h2>
+      <h2 style={{
+        fontSize: '24px',
+        fontWeight: 'bold',
+        marginBottom: '1.5rem',
+        textAlign: 'center',
+        color: '#007bff'
+      }}>
+        會員登入
+      </h2>
 
-      <form onSubmit={handleSubmit}>
-        {message && <p className="text-green-600 font-semibold mb-2">{message}</p>}
-        {error && <p className="text-red-500 font-semibold mb-2">{error}</p>}
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+        {message && <p style={{ color: 'green', fontWeight: 'bold' }}>{message}</p>}
+        {error && <p style={{ color: 'red', fontWeight: 'bold' }}>{error}</p>}
 
-        <label style={{ fontWeight: 'bold' }}>使用者名稱</label><br />
-        <input
-          name="username"
-          onChange={handleChange}
-          value={form.username}
-          placeholder="帳號"
-          required
-          style={{ width: '100%', padding: '8px', marginBottom: '1rem' }}
-        /><br />
-
-        <label style={{ fontWeight: 'bold' }}>密碼</label><br />
-        <input
-          name="password"
-          type="password"
-          onChange={handleChange}
-          value={form.password}
-          placeholder="密碼"
-          required
-          style={{ width: '100%', padding: '8px', marginBottom: '1rem' }}
-        /><br />
-
-        <label style={{ fontWeight: 'bold' }}>驗證碼</label><br />
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+        <div>
+          <label style={{ fontWeight: 'bold', marginBottom: '6px', display: 'block' }}>使用者名稱</label>
           <input
-            name="captcha"
+            name="username"
+            value={form.username}
             onChange={handleChange}
-            value={form.captcha}
-            placeholder="請輸入驗證碼"
+            placeholder="帳號"
             required
-            style={{ flex: 1, padding: '8px' }}
-          />
-          <img
-            src={captchaUrl}
-            alt="驗證碼"
-            onClick={refreshCaptcha}
-            style={{ height: '40px', marginLeft: '10px', cursor: 'pointer', border: '1px solid #ccc' }}
-          />
-          <button
-            type="button"
-            onClick={refreshCaptcha}
-            title="重新整理驗證碼"
             style={{
-              marginLeft: '6px',
-              backgroundColor: '#eee',
-              border: 'none',
-              borderRadius: '4px',
-              padding: '6px 10px',
-              cursor: 'pointer',
-              fontSize: '12px'
+              width: '100%',
+              padding: '10px',
+              fontSize: '16px',
+              border: '1px solid #ccc',
+              borderRadius: '6px'
             }}
-          >
-            🔄
-          </button>
+          />
+        </div>
+
+        <div>
+          <label style={{ fontWeight: 'bold', marginBottom: '6px', display: 'block' }}>密碼</label>
+          <input
+            name="password"
+            type="password"
+            value={form.password}
+            onChange={handleChange}
+            placeholder="密碼"
+            required
+            style={{
+              width: '100%',
+              padding: '10px',
+              fontSize: '16px',
+              border: '1px solid #ccc',
+              borderRadius: '6px'
+            }}
+          />
+        </div>
+
+        <div>
+          <label style={{ fontWeight: 'bold', marginBottom: '6px', display: 'block' }}>驗證碼</label>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <input
+              name="captcha"
+              value={form.captcha}
+              onChange={handleChange}
+              placeholder="驗證碼"
+              required
+              style={{
+                flex: 1,
+                padding: '10px',
+                fontSize: '16px',
+                border: '1px solid #ccc',
+                borderRadius: '6px'
+              }}
+            />
+            <img
+              src={captchaUrl}
+              alt="驗證碼"
+              style={{
+                height: '40px',
+                marginLeft: '10px',
+                borderRadius: '4px',
+                border: '1px solid #ccc'
+              }}
+            />
+            <button
+              type="button"
+              onClick={refreshCaptcha}
+              title="重新整理驗證碼"
+              style={{
+                marginLeft: '6px',
+                backgroundColor: 'transparent',
+                borderRadius: '4px',
+                padding: '6px 8px',
+                fontSize: '14px',
+                cursor: 'pointer'
+              }}
+            >🔄</button>
+          </div>
         </div>
 
         <button
           type="submit"
           style={{
             width: '100%',
-            padding: '10px',
+            padding: '12px',
+            fontSize: '16px',
             backgroundColor: '#007bff',
             color: 'white',
             border: 'none',
-            borderRadius: '4px',
-            fontWeight: 'bold'
+            borderRadius: '6px',
+            fontWeight: 'bold',
+            cursor: 'pointer'
           }}>
           登入
         </button>
 
-        <div className="flex justify-between text-sm mt-3">
-          <Link to="/register" className="text-blue-500 hover:underline">註冊新帳號</Link>
-          <Link to="/forgot" className="text-blue-500 hover:underline">忘記密碼？</Link>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
+          <Link to="/register" style={{ color: '#007bff', textDecoration: 'none' }}>註冊新帳號</Link>
+          <Link to="/forgot" style={{ color: '#007bff', textDecoration: 'none' }}>忘記密碼？</Link>
         </div>
       </form>
     </div>
