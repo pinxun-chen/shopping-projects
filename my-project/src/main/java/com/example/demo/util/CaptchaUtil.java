@@ -17,7 +17,7 @@ public class CaptchaUtil {
     }
 
     public static BufferedImage generateImage(String code) {
-        int width = 120;
+        int width = 100;
         int height = 40;
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = image.createGraphics();
@@ -27,8 +27,8 @@ public class CaptchaUtil {
         g.fillRect(0, 0, width, height);
 
         // 干擾線
-        g.setColor(Color.LIGHT_GRAY);
-        for (int i = 0; i < 5; i++) {
+        g.setColor(Color.DARK_GRAY);
+        for (int i = 0; i < 15; i++) {
             int x1 = (int)(Math.random() * width);
             int y1 = (int)(Math.random() * height);
             int x2 = (int)(Math.random() * width);

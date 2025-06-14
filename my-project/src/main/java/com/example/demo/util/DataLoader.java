@@ -26,7 +26,7 @@ public class DataLoader implements CommandLineRunner {
             Category accessories = new Category(null, "飾品", new ArrayList<>());
             Category shoe = new Category(null, "鞋子", new ArrayList<>());
 
-            categoryRepository.saveAll(List.of(clothes, pants, accessories));
+            categoryRepository.saveAll(List.of(clothes, pants, accessories, shoe));
 
             productRepository.saveAll(List.of(
                 new Product(null, "Drew淺紫色短袖", "舒適棉質", 1600, "https://shoplineimg.com/5fb51d7f25f3d00031ddb131/66e3ed5b9d126c001961757b/800x.jpg?", clothes),
@@ -36,6 +36,8 @@ public class DataLoader implements CommandLineRunner {
                 new Product(null, "Nike Dunk 低筒 Retro 男鞋", "籃球復刻風", 3200, "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/b1bcbca4-e853-4df7-b329-5be3c61ee057/NIKE+DUNK+LOW+RETRO.png", shoe)
             ));
         }
+    System.out.println("資料初始化完成！");    
     }
+    
 }
 
