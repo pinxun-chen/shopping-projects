@@ -98,7 +98,16 @@ const CartPage = () => {
           </div>
         </div>
       ))}
-      <div className="mt-4 font-bold text-lg">總金額：${total}</div>
+      <div className="mt-4 font-bold text-lg">
+        總金額：${total}
+        {total < 2000 ? (
+          <p className="text-sm text-gray-600 mt-1">
+            (滿2000免運)再消費 NT$ {2000 - total} 可享免運優惠 
+          </p>
+        ) : (
+          <p className="text-sm text-green-600 mt-1">已達免運標準</p>
+        )}
+      </div>
       {cartItems.length > 0 && (
         <div className="mt-6 text-right">
               <button
