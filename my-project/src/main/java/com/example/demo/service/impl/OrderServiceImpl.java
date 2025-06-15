@@ -58,6 +58,7 @@ public class OrderServiceImpl implements OrderService {
         order.setReceiverAddress(orderDto.getReceiverAddress());
         order.setPaymentMethod(orderDto.getPaymentMethod());
         order.setEmail(orderDto.getEmail());
+        order.setShippingFee(orderDto.getShippingFee());
 
         int total = 0;
         List<OrderItem> orderItems = new ArrayList<>();
@@ -84,7 +85,7 @@ public class OrderServiceImpl implements OrderService {
             total += item.getPrice() * item.getQuantity();
         }
 
-        order.setTotalAmount(total);
+        order.setTotalAmount(total + order.getShippingFee());
         order.setOrderItems(orderItems);
 
         orderRepo.save(order); // 連同明細一併存入
@@ -111,17 +112,18 @@ public class OrderServiceImpl implements OrderService {
 
             // 組裝信件內容
             String content = "<h3>您好，" + user.getUsername() + "</h3>"
-                + "<p>您的訂單已成功建立，感謝您的購買。</p>"
-                + "<ul>"
-                + "<li>訂單編號：<strong>" + order.getId() + "</strong></li>"
-                + "</ul>"
-                + "<p>訂單商品：</p>"
-                + "<ul>" + itemsHtml + "</ul>"
-                + "<li>總金額：<strong>$" + order.getTotalAmount() + "</strong></li>"
-                + "<li>建立時間：<strong>" + order.getOrderTime().format(FORMATTER) + "</strong></li>"
-                + "<p>如有任何問題歡迎與我們聯繫。</p>";
+                    + "<p>您的訂單已成功建立，感謝您的購買。</p>"
+                    + "<ul>"
+                    + "<li>訂單編號：<strong>" + order.getId() + "</strong></li>"
+                    + "</ul>"
+                    + "<p>訂單商品：</p>"
+                    + "<ul>" + itemsHtml + "</ul>"
+                    + "<li>運費：<strong>$" + order.getShippingFee() + "</strong></li>"
+                    + "<li>總金額：<strong>$" + order.getTotalAmount() + "</strong></li>"
+                    + "<li>建立時間：<strong>" + order.getOrderTime().format(FORMATTER) + "</strong></li>"
+                    + "<p>如有任何問題歡迎與我們聯繫。</p>";
 
-            emailService.sendMail(user.getEmail(), subject, content);
+                emailService.sendMail(user.getEmail(), subject, content);
         }
 
         // 回傳 DTO
@@ -130,6 +132,7 @@ public class OrderServiceImpl implements OrderService {
         dto.setOrderTime(order.getOrderTime());
         dto.setFormattedTime(order.getOrderTime().format(FORMATTER));
         dto.setTotalAmount(order.getTotalAmount());
+        dto.setShippingFee(order.getShippingFee());
         dto.setItems(orderItems.stream().map(oi -> {
             OrderItemDto oidto = new OrderItemDto();
             oidto.setProductId(oi.getProduct().getId());
@@ -155,6 +158,7 @@ public class OrderServiceImpl implements OrderService {
             dto.setOrderTime(order.getOrderTime());
             dto.setFormattedTime(order.getOrderTime().format(FORMATTER));
             dto.setTotalAmount(order.getTotalAmount());
+            dto.setShippingFee(order.getShippingFee());
             dto.setReceiverName(order.getReceiverName());
             dto.setReceiverPhone(order.getReceiverPhone());
             dto.setReceiverAddress(order.getReceiverAddress());
@@ -194,6 +198,7 @@ public class OrderServiceImpl implements OrderService {
         dto.setOrderTime(order.getOrderTime());
         dto.setFormattedTime(order.getOrderTime().format(FORMATTER));
         dto.setTotalAmount(order.getTotalAmount());
+        dto.setShippingFee(order.getShippingFee());
         dto.setReceiverName(order.getReceiverName());
         dto.setReceiverPhone(order.getReceiverPhone());
         dto.setReceiverAddress(order.getReceiverAddress());

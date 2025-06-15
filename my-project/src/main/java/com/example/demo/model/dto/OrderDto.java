@@ -14,6 +14,7 @@ public class OrderDto {
     private LocalDateTime orderTime;      // 訂單時間
     private String formattedTime;         // 時間格式化
     private Integer totalAmount;          // 總金額
+    private Integer shippingFee;          // 運費
 
     private String receiverName;          // 收件人姓名
     private String receiverPhone;         // 收件人電話

@@ -25,6 +25,9 @@ public class Order {
 
     // 訂單總金額
     private Integer totalAmount;
+    
+    // 運費
+    private Integer shippingFee;
 
     // 付款方式（例如：信用卡、7-11）
     private String paymentMethod;
