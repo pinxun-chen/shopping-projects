@@ -246,3 +246,5 @@
 2025-06-16T15:43:22.180+08:00  INFO 9684 --- [springboot-jpa] [http-nio-8082-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
 2025-06-16T15:43:22.181+08:00  INFO 9684 --- [springboot-jpa] [http-nio-8082-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
 2025-06-16T15:43:22.183+08:00  INFO 9684 --- [springboot-jpa] [http-nio-8082-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2025-06-16T16:10:12.694+08:00  WARN 9684 --- [springboot-jpa] [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=47s628ms976µs200ns).
+2025-06-16T20:32:07.978+08:00  WARN 9684 --- [springboot-jpa] [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=4h21m55s284ms147µs600ns).

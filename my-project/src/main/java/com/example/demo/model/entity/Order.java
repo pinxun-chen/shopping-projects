@@ -6,9 +6,11 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.example.demo.model.enums.OrderStatus;
+
 @Entity
 @Data
-@Table(name = "orders") // 防止與 SQL 保留字衝突
+@Table(name = "orders") 
 public class Order {
 
     @Id
@@ -36,7 +38,11 @@ public class Order {
     private String receiverName;
     private String receiverPhone;
     private String receiverAddress;
-    private String email; // 可選：寄送通知用
+    private String email; 
+    
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private OrderStatus status = OrderStatus.待出貨;
 
     // 訂單明細
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
