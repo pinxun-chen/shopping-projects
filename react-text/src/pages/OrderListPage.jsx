@@ -72,7 +72,24 @@ const OrderListPage = () => {
               <p><strong>收件人姓名：</strong>{order.receiverName || '未填寫'}</p>
               <p><strong>收件人電話：</strong>{order.receiverPhone || '未填寫'}</p>
               <p><strong>收件地址：</strong>{order.receiverAddress || '未填寫'}</p>
+              <p><strong>Email：</strong>{order.email || '未填寫'}</p>
 
+              <p className="mt-2">
+                <strong>訂單狀態：</strong>
+                <span
+                  className={`font-bold px-2 py-1 rounded ${
+                    order.status === '待出貨'
+                      ? 'bg-blue-100 text-blue-700'
+                      : order.status === '已出貨'
+                      ? 'bg-yellow-100 text-yellow-700'
+                      : order.status === '已完成'
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-gray-100 text-gray-600'
+                  }`}
+                >
+                  {order.status || '未知狀態'}
+                </span>
+              </p>
               <p className="mt-2"><strong>商品小計：</strong>${subtotal}</p>
               <p><strong>運費：</strong>{shippingFee === 0 ? '免運費' : `$${shippingFee}`}</p>
               <p className="text-green-700 font-bold text-lg"><strong>總金額：</strong>${order.totalAmount}</p>
