@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.model.dto.ProductDto;
 import com.example.demo.model.dto.ProductSalesDto;
 import com.example.demo.model.entity.User;
+import com.example.demo.model.enums.OrderStatus;
 import com.example.demo.response.ApiResponse;
 import com.example.demo.service.AdminService;
 
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RestController
@@ -119,6 +121,24 @@ public class AdminController {
     public ResponseEntity<ApiResponse<List<ProductSalesDto>>> getProductSalesReport() {
         List<ProductSalesDto> report = adminService.getProductSalesReport();
         return ResponseEntity.ok(ApiResponse.success("報表查詢成功", report));
+    }
+    
+    // 管理者更新訂單狀態
+    @PutMapping("/orders/{orderId}/status")
+    public ResponseEntity<ApiResponse<Void>> updateOrderStatus(
+            @PathVariable Integer orderId,
+            @RequestBody Map<String, String> body
+    ) {
+        try {
+            String statusStr = body.get("status");
+            OrderStatus newStatus = OrderStatus.valueOf(statusStr); // Enum 轉換
+            adminService.updateOrderStatus(orderId, newStatus);
+            return ResponseEntity.ok(ApiResponse.success("訂單狀態已更新", null));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(400, "無效的訂單狀態"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(ApiResponse.error(404, e.getMessage()));
+        }
     }
     
 }

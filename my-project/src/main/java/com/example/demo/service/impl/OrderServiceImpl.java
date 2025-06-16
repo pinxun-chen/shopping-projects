@@ -16,6 +16,7 @@ import com.example.demo.model.entity.Order;
 import com.example.demo.model.entity.OrderItem;
 import com.example.demo.model.entity.ProductVariant;
 import com.example.demo.model.entity.User;
+import com.example.demo.model.enums.OrderStatus;
 import com.example.demo.repository.CartItemRepository;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.UserRepository;
@@ -59,6 +60,7 @@ public class OrderServiceImpl implements OrderService {
         order.setPaymentMethod(orderDto.getPaymentMethod());
         order.setEmail(orderDto.getEmail());
         order.setShippingFee(orderDto.getShippingFee());
+        order.setStatus(OrderStatus.待出貨);
 
         int total = 0;
         List<OrderItem> orderItems = new ArrayList<>();
@@ -133,6 +135,7 @@ public class OrderServiceImpl implements OrderService {
         dto.setFormattedTime(order.getOrderTime().format(FORMATTER));
         dto.setTotalAmount(order.getTotalAmount());
         dto.setShippingFee(order.getShippingFee());
+        dto.setStatus(order.getStatus());
         dto.setItems(orderItems.stream().map(oi -> {
             OrderItemDto oidto = new OrderItemDto();
             oidto.setProductId(oi.getProduct().getId());
@@ -164,6 +167,7 @@ public class OrderServiceImpl implements OrderService {
             dto.setReceiverAddress(order.getReceiverAddress());
             dto.setPaymentMethod(order.getPaymentMethod());
             dto.setEmail(order.getEmail());
+            dto.setStatus(order.getStatus());
 
             List<OrderItemDto> itemDtos = order.getOrderItems().stream().map(oi -> {
                 OrderItemDto oidto = new OrderItemDto();
@@ -204,6 +208,7 @@ public class OrderServiceImpl implements OrderService {
         dto.setReceiverAddress(order.getReceiverAddress());
         dto.setPaymentMethod(order.getPaymentMethod());
         dto.setEmail(order.getEmail());
+        dto.setStatus(order.getStatus());
 
         // 商品明細（可選）
         List<OrderItemDto> itemDtos = order.getOrderItems().stream().map(item -> {
@@ -220,4 +225,5 @@ public class OrderServiceImpl implements OrderService {
 
         return dto;
     }
+
 }

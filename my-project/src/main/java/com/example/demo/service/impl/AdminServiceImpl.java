@@ -8,6 +8,7 @@ import com.example.demo.model.entity.Category;
 import com.example.demo.model.entity.Order;
 import com.example.demo.model.entity.Product;
 import com.example.demo.model.entity.User;
+import com.example.demo.model.enums.OrderStatus;
 import com.example.demo.repository.CartItemRepository;
 import com.example.demo.repository.CategoryRepository;
 import com.example.demo.repository.OrderItemRepository;
@@ -130,6 +131,7 @@ public class AdminServiceImpl implements AdminService {
             dto.setReceiverAddress(order.getReceiverAddress());
             dto.setPaymentMethod(order.getPaymentMethod());
             dto.setEmail(order.getEmail());
+            dto.setStatus(order.getStatus());
 
             List<OrderItemDto> items = order.getOrderItems().stream().map(item -> {
                 OrderItemDto itemDto = new OrderItemDto();
@@ -163,5 +165,15 @@ public class AdminServiceImpl implements AdminService {
     public List<ProductSalesDto> getProductSalesReport() {
         return orderItemRepo.findProductSalesReport();
     }
+
+    @Override
+    @Transactional
+    public void updateOrderStatus(Integer orderId, OrderStatus newStatus) {
+        Order order = orderRepo.findById(orderId)
+            .orElseThrow(() -> new RuntimeException("查無此訂單"));
+        order.setStatus(newStatus);
+        orderRepo.save(order);
+    }
+
 
 }

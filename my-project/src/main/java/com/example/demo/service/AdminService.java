@@ -4,6 +4,7 @@ import com.example.demo.model.dto.OrderDto;
 import com.example.demo.model.dto.ProductDto;
 import com.example.demo.model.dto.ProductSalesDto;
 import com.example.demo.model.entity.User;
+import com.example.demo.model.enums.OrderStatus;
 
 import java.util.List;
 
@@ -23,4 +24,6 @@ public interface AdminService {
     boolean cancelOrder(Integer orderId);
     
     List<ProductSalesDto> getProductSalesReport();
+    
+    void updateOrderStatus(Integer orderId, OrderStatus newStatus);
 }

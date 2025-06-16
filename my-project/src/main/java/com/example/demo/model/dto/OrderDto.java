@@ -3,6 +3,8 @@ package com.example.demo.model.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.example.demo.model.enums.OrderStatus;
+
 import lombok.Data;
 
 @Data
@@ -22,6 +24,8 @@ public class OrderDto {
     
     private String paymentMethod;         // 付款方式（宅配、超商、信用卡）
     private String email;                 // 收件人 Email
+    
+    private OrderStatus status;           // 訂單狀態
 
     private List<OrderItemDto> items;     // 商品明細列表
 }
