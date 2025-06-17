@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.model.dto.ProductDetailDto;
 import com.example.demo.model.dto.ProductDto;
-import com.example.demo.model.entity.Product;
 import com.example.demo.response.ApiResponse;
 import com.example.demo.service.ProductService;
 
@@ -52,18 +51,20 @@ public class ProductController {
     
     // 新增商品
     @PostMapping
-    public ResponseEntity<ApiResponse<String>> createProduct(@RequestBody Product product) {
-        productService.save(product);
+    public ResponseEntity<ApiResponse<String>> createProduct(@RequestBody ProductDto dto) {
+        productService.createProductWithVariants(dto);
         return ResponseEntity.ok(ApiResponse.success("新增成功", null));
     }
 
+
     // 修改商品
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<String>> updateProduct(@PathVariable Integer id, @RequestBody Product product) {
-        product.setId(id);
-        productService.save(product);
+    public ResponseEntity<ApiResponse<String>> updateProduct(@PathVariable Integer id, @RequestBody ProductDto dto) {
+        dto.setId(id);
+        productService.updateProductWithVariants(dto);
         return ResponseEntity.ok(ApiResponse.success("修改成功", null));
     }
+
 
     // 刪除商品
     @DeleteMapping("/{id}")

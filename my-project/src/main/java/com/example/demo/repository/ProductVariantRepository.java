@@ -10,4 +10,5 @@ import com.example.demo.model.entity.ProductVariant;
 @Repository
 public interface ProductVariantRepository extends JpaRepository<ProductVariant, Integer> {
 	List<ProductVariant> findByProduct_Id(Integer productId);
+	List<ProductVariant> deleteByProduct_Id(Integer productId);
 }

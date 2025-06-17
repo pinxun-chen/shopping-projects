@@ -20,6 +20,7 @@ import com.example.demo.repository.ProductVariantRepository;
 import com.example.demo.service.CategoryService;
 import com.example.demo.service.ProductService;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -52,16 +53,16 @@ public class ProductServiceImpl implements ProductService {
         return dto;
     }
     
-    @Override
-    public void save(Product product) {
-        if (product.getCategory() == null || product.getCategory().getId() == null) {
-            throw new IllegalArgumentException("請選擇分類");
-        }
-        Category category = categoryRepository.findById(product.getCategory().getId())
-                .orElseThrow(() -> new RuntimeException("找不到分類 ID: " + product.getCategory().getId()));
-        product.setCategory(category);
-        productRepository.save(product);
-    }
+//    @Override
+//    public void save(Product product) {
+//        if (product.getCategory() == null || product.getCategory().getId() == null) {
+//            throw new IllegalArgumentException("請選擇分類");
+//        }
+//        Category category = categoryRepository.findById(product.getCategory().getId())
+//                .orElseThrow(() -> new RuntimeException("找不到分類 ID: " + product.getCategory().getId()));
+//        product.setCategory(category);
+//        productRepository.save(product);
+//    }
 
 
     @Override
@@ -74,7 +75,7 @@ public class ProductServiceImpl implements ProductService {
         List<Category> categoryList = categoryRepository.findAll();
         return categoryList.stream().map(category -> {
             CategoryDto dto = new CategoryDto();
-            dto.setId(category.getId());
+            //dto.setId(category.getId());
             dto.setName(category.getName());
             return dto;
         }).collect(Collectors.toList());
@@ -106,7 +107,7 @@ public class ProductServiceImpl implements ProductService {
     
     @Override
     public List<ProductDto> getProductsByCategoryName(String categoryName) {
-        Optional<Category> categoryOpt = categoryService.getCategoryByName(categoryName);
+        Optional<CategoryDto> categoryOpt = categoryService.getCategoryByName(categoryName);
         if (categoryOpt.isEmpty()) {
             throw new RuntimeException("分類不存在");
         }
@@ -116,6 +117,75 @@ public class ProductServiceImpl implements ProductService {
                        .map(p -> modelMapper.map(p, ProductDto.class))
                        .toList();
     }
+
+    @Override
+    @Transactional
+    public void createProductWithVariants(ProductDto dto) {
+        // 建立商品本體
+        Product product = new Product();
+        product.setName(dto.getName());
+        product.setDescription(dto.getDescription());
+        product.setPrice(dto.getPrice());
+        product.setImageUrl(dto.getImageUrl());
+
+        // 透過 categoryName 找分類（你用 categoryId 的話請改成 findById）
+        Category category = categoryRepository.findByName(dto.getCategoryName())
+            .orElseThrow(() -> new RuntimeException("找不到分類：" + dto.getCategoryName()));
+        product.setCategory(category);
+
+        // 儲存商品
+        Product savedProduct = productRepository.save(product);
+
+        // 儲存 variants
+        if (dto.getVariants() != null && !dto.getVariants().isEmpty()) {
+            List<ProductVariant> variants = dto.getVariants().stream().map(vdto -> {
+                ProductVariant variant = new ProductVariant();
+                variant.setSize(vdto.getSize());
+                variant.setStock(vdto.getStock());
+                variant.setProduct(savedProduct); // 關聯回 product
+                return variant;
+            }).collect(Collectors.toList());
+
+            variantRepository.saveAll(variants);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void updateProductWithVariants(ProductDto dto) {
+        Product product = productRepository.findById(dto.getId())
+            .orElseThrow(() -> new RuntimeException("找不到商品 ID：" + dto.getId()));
+
+        product.setName(dto.getName());
+        product.setDescription(dto.getDescription());
+        product.setPrice(dto.getPrice());
+        product.setImageUrl(dto.getImageUrl());
+
+        Category category = categoryRepository.findByName(dto.getCategoryName())
+                .orElseThrow(() -> new RuntimeException("找不到分類：" + dto.getCategoryName()));
+        product.setCategory(category);
+
+        productRepository.save(product);
+
+        // 更新 variants（這邊你可以依需求選擇清除後重建，或比對更新）
+        if (dto.getVariants() != null) {
+            // 清除原有
+            variantRepository.deleteByProduct_Id(product.getId());
+
+            // 新增新的
+            List<ProductVariant> variants = dto.getVariants().stream().map(vdto -> {
+                ProductVariant variant = new ProductVariant();
+                variant.setSize(vdto.getSize());
+                variant.setStock(vdto.getStock());
+                variant.setProduct(product);
+                return variant;
+            }).collect(Collectors.toList());
+
+            variantRepository.saveAll(variants);
+        }
+    }
+
+
 
 
 }
