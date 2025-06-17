@@ -9,6 +9,8 @@ function ProductDetailPage() {
   const [editForm, setEditForm] = useState({ name: '', description: '', price: '', imageUrl: '', categoryId: '' });
   const [editingVariants, setEditingVariants] = useState({});
   const [categories, setCategories] = useState([]);
+  const [originalForm, setOriginalForm] = useState(null);
+
 
   const fetchProduct = async () => {
     try {
@@ -16,13 +18,15 @@ function ProductDetailPage() {
       const data = await res.json();
       if (data.status === 200) {
         setProduct(data.data);
-        setEditForm({
+        const formData = {
           name: data.data.name,
           description: data.data.description,
           price: data.data.price,
           imageUrl: data.data.imageUrl,
           categoryId: data.data.categoryId?.toString() || ''
-        });
+        };
+        setEditForm(formData);
+        setOriginalForm(formData);
       } else {
         alert(data.message);
       }
@@ -30,6 +34,9 @@ function ProductDetailPage() {
       alert('查詢失敗: ' + err.message);
     }
   };
+
+  const isProductFormChanged = originalForm && JSON.stringify(editForm) !== JSON.stringify(originalForm);
+
 
   const fetchCategories = async () => {
     try {
@@ -222,7 +229,15 @@ function ProductDetailPage() {
           <input className="border px-2 py-1 w-full" name="imageUrl" value={editForm.imageUrl} onChange={handleEditChange} />
         </div>
 
-        <button onClick={handleUpdateProduct} className="mt-4 bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700">
+        <button
+          onClick={handleUpdateProduct}
+          className={`mt-4 px-4 py-1 rounded text-white ${
+            isProductFormChanged
+              ? 'bg-blue-600 hover:bg-blue-700'
+              : 'bg-gray-400 cursor-not-allowed'
+          }`}
+          disabled={!isProductFormChanged}
+        >
           儲存變更
         </button>
       </div>
@@ -243,15 +258,26 @@ function ProductDetailPage() {
               <td className="border px-2 py-1">
                 <input
                   type="number"
+                  min="0"
                   value={editingVariants[v.variantId] ?? v.stock}
-                  onChange={e => handleVariantStockChange(v.variantId, e.target.value)}
+                  onChange={e => {
+                    const value = parseInt(e.target.value, 10);
+                    if (value >= 0) {
+                      handleVariantStockChange(v.variantId, value);
+                    }
+                  }}
                   className="border px-2 py-1 w-20 text-center"
                 />
               </td>
               <td className="border px-2 py-1 space-x-1">
                 <button
                   onClick={() => handleUpdateVariant(v.variantId)}
-                  className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                  className={`px-2 py-1 rounded ${
+                    editingVariants[v.variantId] != null && editingVariants[v.variantId] !== v.stock
+                      ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                      : 'bg-gray-400 text-white cursor-not-allowed'
+                  }`}
+                  disabled={editingVariants[v.variantId] == null || editingVariants[v.variantId] === v.stock}
                 >
                   儲存
                 </button>
@@ -279,9 +305,15 @@ function ProductDetailPage() {
         <input
           name="stock"
           value={variantForm.stock}
-          onChange={handleVariantChange}
+          onChange={(e) => {
+            const value = parseInt(e.target.value, 10);
+            if (value >= 0 || e.target.value === '') {
+              handleVariantChange(e); // 只在合法時更新
+            }
+          }}
           placeholder="庫存"
           type="number"
+          min="0"
           className="border px-2 py-1 mr-2"
         />
         <button
