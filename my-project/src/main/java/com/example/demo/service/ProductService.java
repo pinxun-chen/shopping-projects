@@ -2,6 +2,8 @@ package com.example.demo.service;
 
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.example.demo.model.dto.CategoryDto;
 import com.example.demo.model.dto.ProductDetailDto;
 import com.example.demo.model.dto.ProductDto;
@@ -17,4 +19,5 @@ public interface ProductService {
     List<ProductDto> getProductsByCategoryName(String categoryName);
     void createProductWithVariants(ProductDto dto);
     void updateProductWithVariants(ProductDto dto);
+    void createProductWithImage(String name, String description, Integer price, Integer categoryId, MultipartFile imageFile);
 }

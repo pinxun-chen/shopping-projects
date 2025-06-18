@@ -1,11 +1,17 @@
 package com.example.demo.service.impl;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.model.dto.CategoryDto;
 import com.example.demo.model.dto.ProductDetailDto;
@@ -186,6 +192,33 @@ public class ProductServiceImpl implements ProductService {
     }
 
 
+    @Override
+    public void createProductWithImage(String name, String description, Integer price, Integer categoryId, MultipartFile imageFile) {
+        try {
+            Category category = categoryRepository.findById(categoryId)
+                    .orElseThrow(() -> new RuntimeException("找不到分類"));
 
+            // 圖片儲存處理
+            String uploadDir = "uploads/";
+            String fileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
+            Path uploadPath = Paths.get(uploadDir);
+            Files.createDirectories(uploadPath);
+
+            Path filePath = uploadPath.resolve(fileName);
+            Files.write(filePath, imageFile.getBytes());
+
+            // 建立商品
+            Product product = new Product();
+            product.setName(name);
+            product.setDescription(description);
+            product.setPrice(price);
+            product.setCategory(category);
+            product.setImageUrl("/uploads/" + fileName); // 存相對網址
+
+            productRepository.save(product);
+        } catch (IOException e) {
+            throw new RuntimeException("圖片儲存失敗：" + e.getMessage());
+        }
+    }
 
 }

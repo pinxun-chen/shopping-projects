@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.model.dto.ProductDetailDto;
 import com.example.demo.model.dto.ProductDto;
@@ -79,6 +81,18 @@ public class ProductController {
         List<ProductDto> products = productService.getProductsByCategoryName(categoryName);
         String message = products.isEmpty() ? "查無此分類的商品" : "查詢成功";
         return ResponseEntity.ok(ApiResponse.success(message, products));
+    }
+    
+    @PostMapping("/upload")
+    public ResponseEntity<ApiResponse<String>> createProductWithImage(
+            @RequestParam String name,
+            @RequestParam String description,
+            @RequestParam Integer price,
+            @RequestParam Integer categoryId,
+            @RequestParam("image") MultipartFile imageFile
+    ) {
+        productService.createProductWithImage(name, description, price, categoryId, imageFile);
+        return ResponseEntity.ok(ApiResponse.success("新增成功", null));
     }
     
 }
