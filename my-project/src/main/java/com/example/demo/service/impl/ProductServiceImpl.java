@@ -5,7 +5,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -73,6 +72,22 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void delete(Integer id) {
+        Product product = productRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("找不到商品"));
+
+        // 如果 imageUrl 是本地圖片，刪除實體檔案
+        String imageUrl = product.getImageUrl();
+        if (imageUrl != null && !imageUrl.startsWith("http")) {
+            try {
+                // 去除開頭的 "/"
+                String relativePath = imageUrl.startsWith("/") ? imageUrl.substring(1) : imageUrl;
+                Path path = Paths.get(relativePath);
+                Files.deleteIfExists(path);
+            } catch (IOException e) {
+                throw new RuntimeException("刪除圖片檔案失敗：" + e.getMessage());
+            }
+        }
+        // 刪除商品
         productRepository.deleteById(id);
     }
     
@@ -113,15 +128,15 @@ public class ProductServiceImpl implements ProductService {
     
     @Override
     public List<ProductDto> getProductsByCategoryName(String categoryName) {
-        Optional<CategoryDto> categoryOpt = categoryService.getCategoryByName(categoryName);
-        if (categoryOpt.isEmpty()) {
-            throw new RuntimeException("分類不存在");
-        }
+        // 透過 categoryRepository 查詢 Category Entity（不是 DTO）
+        Category category = categoryRepository.findByName(categoryName)
+            .orElseThrow(() -> new RuntimeException("分類不存在: " + categoryName));
 
-        List<Product> products = productRepository.findByCategory(categoryOpt.get());
+        List<Product> products = productRepository.findByCategory(category);
+
         return products.stream()
                        .map(p -> modelMapper.map(p, ProductDto.class))
-                       .toList();
+                       .collect(Collectors.toList());
     }
 
     @Override
@@ -193,7 +208,7 @@ public class ProductServiceImpl implements ProductService {
 
 
     @Override
-    public void createProductWithImage(String name, String description, Integer price, Integer categoryId, MultipartFile imageFile) {
+    public ProductDto createProductWithImage(String name, String description, Integer price, Integer categoryId, MultipartFile imageFile) {
         try {
             Category category = categoryRepository.findById(categoryId)
                     .orElseThrow(() -> new RuntimeException("找不到分類"));
@@ -215,7 +230,18 @@ public class ProductServiceImpl implements ProductService {
             product.setCategory(category);
             product.setImageUrl("/uploads/" + fileName); // 存相對網址
 
-            productRepository.save(product);
+            Product saved = productRepository.save(product);
+            
+            ProductDto dto = new ProductDto();
+            dto.setId(saved.getId());
+            dto.setName(saved.getName());
+            dto.setDescription(saved.getDescription());
+            dto.setPrice(saved.getPrice());
+            dto.setImageUrl(saved.getImageUrl());
+            dto.setCategoryName(saved.getCategory().getName());
+            dto.setVariants(null);
+
+            return dto;
         } catch (IOException e) {
             throw new RuntimeException("圖片儲存失敗：" + e.getMessage());
         }

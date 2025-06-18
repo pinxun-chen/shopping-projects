@@ -19,5 +19,5 @@ public interface ProductService {
     List<ProductDto> getProductsByCategoryName(String categoryName);
     void createProductWithVariants(ProductDto dto);
     void updateProductWithVariants(ProductDto dto);
-    void createProductWithImage(String name, String description, Integer price, Integer categoryId, MultipartFile imageFile);
+    ProductDto createProductWithImage(String name, String description, Integer price, Integer categoryId, MultipartFile imageFile);
 }

@@ -84,16 +84,17 @@ public class ProductController {
     }
     
     @PostMapping("/upload")
-    public ResponseEntity<ApiResponse<String>> createProductWithImage(
+    public ResponseEntity<ApiResponse<ProductDto>> createProductWithImage(
             @RequestParam String name,
             @RequestParam String description,
             @RequestParam Integer price,
             @RequestParam Integer categoryId,
             @RequestParam("image") MultipartFile imageFile
     ) {
-        productService.createProductWithImage(name, description, price, categoryId, imageFile);
-        return ResponseEntity.ok(ApiResponse.success("新增成功", null));
+        ProductDto savedDto = productService.createProductWithImage(name, description, price, categoryId, imageFile);
+        return ResponseEntity.ok(ApiResponse.success("新增成功", savedDto));
     }
+
     
 }
 
