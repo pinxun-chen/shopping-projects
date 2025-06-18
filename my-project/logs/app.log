@@ -159,3 +159,12 @@
 2025-06-18T11:29:51.689+08:00  INFO 20644 --- [springboot-jpa] [http-nio-8082-exec-3] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
 2025-06-18T11:29:51.690+08:00  INFO 20644 --- [springboot-jpa] [http-nio-8082-exec-3] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
 2025-06-18T11:43:37.912+08:00  WARN 20644 --- [springboot-jpa] [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=2m22s743ms323µs600ns).
+2025-06-18T12:20:58.052+08:00  WARN 20644 --- [springboot-jpa] [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=2m19s623ms566µs700ns).
+2025-06-18T13:39:20.182+08:00  WARN 20644 --- [springboot-jpa] [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1h14m22s95ms333µs900ns).
+2025-06-18T14:09:04.756+08:00  WARN 20644 --- [springboot-jpa] [HikariPool-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m44s379ms442µs100ns).
+2025-06-18T17:02:54.378+08:00  INFO 20644 --- [springboot-jpa] [RMI TCP Connection(249)-127.0.0.1] inMXBeanRegistrar$SpringApplicationAdmin : Application shutdown requested.
+2025-06-18T17:02:54.531+08:00  INFO 20644 --- [springboot-jpa] [RMI TCP Connection(249)-127.0.0.1] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-06-18T17:02:54.577+08:00  INFO 20644 --- [springboot-jpa] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-06-18T17:02:54.610+08:00  INFO 20644 --- [springboot-jpa] [RMI TCP Connection(249)-127.0.0.1] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-06-18T17:02:54.641+08:00  INFO 20644 --- [springboot-jpa] [RMI TCP Connection(249)-127.0.0.1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-06-18T17:02:54.660+08:00  INFO 20644 --- [springboot-jpa] [RMI TCP Connection(249)-127.0.0.1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
