@@ -100,7 +100,13 @@ const ProductListPage = () => {
           <div key={product.id} className="border rounded-lg shadow p-4 flex flex-col hover:shadow-lg transition h-96 cursor-pointer"
             onClick={() => navigate(`/products/${product.id}`)}>
             <img
-              src={product.imageUrl || '/assets/no-image.png'}
+              src={
+                product.imageUrl?.startsWith('http')
+                  ? product.imageUrl
+                  : product.imageUrl
+                    ? `http://localhost:8082${product.imageUrl}`
+                    : '/assets/no-image.png'
+              }
               alt={product.name}
               className="h-48 object-cover rounded mb-3"
             />

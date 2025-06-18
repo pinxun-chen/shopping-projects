@@ -63,7 +63,11 @@ function ProductAdminPage() {
           {filteredProducts.map((p) => (
             <tr key={p.id} className="hover:bg-gray-50">
               <td className="border px-4 py-2">
-                <img src={p.imageUrl} alt={p.name} className="w-16 h-16 object-cover" />
+                <img
+                  src={p.imageUrl.startsWith('http') ? p.imageUrl : `http://localhost:8082${p.imageUrl}`}
+                  alt={p.name}
+                  className="w-16 h-16 object-cover"
+                /> 
               </td>
               <td className="border px-4 py-2">{p.name}</td>
               <td className="border px-4 py-2">{p.categoryName}</td>

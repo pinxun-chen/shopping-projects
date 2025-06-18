@@ -214,7 +214,17 @@ function ProductDetailPageUser() {
     <div className="max-w-4xl mx-auto p-4">
       {/* 商品資訊區 */}
       <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-10">
-        <img src={product.imageUrl} alt={product.name} className="w-64 h-64 object-cover rounded shadow" />
+        <img
+          src={
+            product.imageUrl?.startsWith('http')
+              ? product.imageUrl
+              : product.imageUrl
+                ? `http://localhost:8082${product.imageUrl}`
+                : '/assets/no-image.png'
+          }
+          alt={product.name}
+          className="w-64 h-64 object-cover rounded shadow"
+        />
         <div className="flex-1">
           <h2 className="text-2xl font-bold mb-2">{product.name}</h2>
           <p className="text-lg mb-1">價格: <span className="font-semibold">${product.price}</span></p>

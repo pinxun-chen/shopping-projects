@@ -6,9 +6,9 @@ function ProductFormPage() {
     name: '',
     description: '',
     price: '',
-    imageUrl: '',
     categoryId: ''
   });
+  const [imageFile, setImageFile] = useState(null); // 圖片上傳
   const [categories, setCategories] = useState([]);
   const [newCategory, setNewCategory] = useState('');
   const [showAddCategory, setShowAddCategory] = useState(false);
@@ -30,10 +30,81 @@ function ProductFormPage() {
     }
   };
 
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async () => {
+    const { name, description, price, categoryId } = form;
+
+    if (!name || !description || !price || !categoryId || !imageFile) {
+      alert("請完整填寫所有欄位並上傳圖片");
+      return;
+    }
+
+    if (parseInt(price) < 0) {
+      alert("價格不能為負數");
+      return;
+    }
+
+    const selectedCategory = categories.find(c => c.id === parseInt(categoryId));
+    if (!selectedCategory) {
+      alert("找不到對應的分類名稱");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("description", description);
+    formData.append("price", parseInt(price));
+    formData.append("categoryId", categoryId);
+    formData.append("image", imageFile);
+
+    try {
+      const res = await fetch('/api/products/upload', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include'
+      });
+      const data = await res.json();
+      if (data.status === 200) {
+        const productId = data.data?.id;
+        if (!productId) {
+          alert("無法取得商品 ID，尺寸無法儲存");
+          return;
+        }
+
+        // 呼叫每一個 variant API
+        for (const v of variants) {
+          await fetch(`/api/variants/product/${productId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+              size: v.size,
+              stock: v.stock
+            })
+          });
+        }
+
+        alert('新增商品與尺寸成功');
+        navigate('/admin/products');
+      } else {
+        alert(data.message || '新增失敗');
+      }
+    } catch (err) {
+      alert('新增錯誤: ' + err.message);
+    }
+  };
+
   const handleAddCategory = async () => {
-    const nameToFind = newCategory.trim(); // 先記住分類名稱
+    const nameToFind = newCategory.trim();
     if (!nameToFind) return alert('請輸入分類名稱');
-    
     try {
       const res = await fetch('/api/category', {
         method: 'POST',
@@ -44,12 +115,8 @@ function ProductFormPage() {
       const data = await res.json();
       if (data.status === 200) {
         alert('新增分類成功');
-
-        // 先關閉輸入框
         setShowAddCategory(false);
         setNewCategory('');
-
-        // 重新取得所有分類並選取剛剛新增的那筆
         const updatedRes = await fetch('/api/category');
         const updatedData = await updatedRes.json();
         if (updatedData.status === 200) {
@@ -67,25 +134,16 @@ function ProductFormPage() {
     }
   };
 
-
   const handleDeleteCategory = async (name) => {
-    const cleanName = name?.trim(); 
-
-    if (!cleanName) {
-      alert("分類名稱不可為空");
-      return;
-    }
-
+    const cleanName = name?.trim();
+    if (!cleanName) return alert("分類名稱不可為空");
     if (!window.confirm(`確定要刪除分類「${cleanName}」嗎？`)) return;
-
     try {
       const res = await fetch(`/api/category/name/${encodeURIComponent(cleanName)}`, {
         method: 'DELETE',
         credentials: 'include'
       });
-
       const data = await res.json();
-
       if (res.ok && data.status === 200) {
         alert('刪除成功');
         fetchCategories();
@@ -97,71 +155,11 @@ function ProductFormPage() {
     }
   };
 
-
-
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async () => {
-    const { name, description, price, imageUrl, categoryId } = form;
-
-    if (!name || !description || !price || !imageUrl || !categoryId) {
-      alert("請完整填寫所有欄位");
-      return;
-    }
-
-    if (parseInt(price) < 0) {
-      alert("價格不能為負數");
-      return;
-    }
-
-    const selectedCategory = categories.find(c => c.id === parseInt(categoryId));
-    if (!selectedCategory) {
-      alert("找不到對應的分類名稱");
-      return;
-    }
-
-    const payload = {
-      name,
-      description,
-      price: parseInt(price),
-      imageUrl,
-      categoryName: selectedCategory.name,
-      variants
-    };
-
-    try {
-      const res = await fetch('/api/products', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(payload)
-      });
-      const data = await res.json();
-      if (data.status === 200) {
-        alert('新增成功');
-        navigate('/admin/products');
-      } else {
-        alert(data.message || '新增失敗');
-      }
-    } catch (err) {
-      alert('新增錯誤: ' + err.message);
-    }
-  };
-
-
   const handleAddVariant = () => {
     const { size, stock } = variantForm;
     if (!size || stock === '') return alert('請填寫尺寸與庫存');
     if (parseInt(stock) < 0) return alert('庫存不能為負數');
     if (variants.find(v => v.size === size)) return alert('該尺寸已存在');
-
     setVariants([...variants, { size, stock: parseInt(stock) }]);
     setVariantForm({ size: '', stock: '' });
   };
@@ -183,8 +181,13 @@ function ProductFormPage() {
       <label className="block mb-2">價格</label>
       <input type="number" min="0" className="border w-full px-3 py-2 mb-4" name="price" value={form.price} onChange={handleChange} />
 
-      <label className="block mb-2">圖片網址</label>
-      <input className="border w-full px-3 py-2 mb-4" name="imageUrl" value={form.imageUrl} onChange={handleChange} />
+      <label className="block mb-2">上傳圖片</label>
+      <input
+        type="file"
+        accept="image/*"
+        className="mb-4"
+        onChange={(e) => setImageFile(e.target.files[0])}
+      />
 
       <label className="block mb-2">分類</label>
       <div className="mb-4">
@@ -242,7 +245,7 @@ function ProductFormPage() {
               <span>{cat.name}</span>
               <button
                 className="text-red-600 hover:text-red-800"
-                onClick={() => handleDeleteCategory(cat.name)} // ✅ 改傳 name
+                onClick={() => handleDeleteCategory(cat.name)}
               >
                 刪除分類
               </button>
@@ -277,7 +280,7 @@ function ProductFormPage() {
         />
         <button
           onClick={handleAddVariant}
-          className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+          className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 w-28"
         >
           新增尺寸
         </button>
