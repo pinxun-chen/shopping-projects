@@ -64,11 +64,11 @@ const UserAdminPage = () => {
 
   const deleteUser = async (username) => {
     if (username === currentUsername) {
-      alert(" 不能刪除自己帳號！");
+      alert(" 不能封鎖自己帳號！");
       return;
     }
 
-    const confirm = window.confirm(`確定要刪除使用者「${username}」？此操作不可恢復。`);
+    const confirm = window.confirm(`確定要封鎖使用者「${username}」？此操作不可恢復。`);
     if (!confirm) return;
 
     try {
@@ -78,13 +78,13 @@ const UserAdminPage = () => {
       });
       const result = await res.json();
       if (res.status === 200) {
-        alert("帳號已成功刪除");
+        alert("帳號已成功封鎖");
         fetchUsers();
       } else {
-        alert(result.message || "刪除失敗");
+        alert(result.message || "封鎖失敗");
       }
     } catch (err) {
-      alert("刪除錯誤：" + err.message);
+      alert("封鎖錯誤：" + err.message);
     }
   };
 
@@ -136,7 +136,7 @@ const UserAdminPage = () => {
                   onClick={() => deleteUser(user.username)}
                   className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
                 >
-                  刪除
+                  封鎖
                 </button>
               </td>
             </tr>
