@@ -26,7 +26,7 @@ const OrderListPage = () => {
   };
 
   useEffect(() => {
-    const uid = localStorage.getItem('userId');
+    const uid = sessionStorage.getItem('userId');
     if (!uid) {
       setLoggedIn(false);
       return;

@@ -10,10 +10,10 @@ function LoginPage({ onLogin, loggedIn }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const msg = localStorage.getItem('verifyMessage');
+    const msg = sessionStorage.getItem('verifyMessage');
     if (msg) {
       setMessage(msg);
-      localStorage.removeItem('verifyMessage');
+      sessionStorage.removeItem('verifyMessage');
     }
   }, []);
 
@@ -34,10 +34,11 @@ function LoginPage({ onLogin, loggedIn }) {
     if (result.status === 200) {
       const { userId, username, role } = result.data;
 
-      localStorage.setItem("userId", userId);
-      localStorage.setItem("username", username);
-      localStorage.setItem("role", role);
-      localStorage.setItem("loggedIn", "true");
+      // ✅ 改用 sessionStorage 儲存登入資訊（不會跨分頁共用）
+      sessionStorage.setItem("userId", userId);
+      sessionStorage.setItem("username", username);
+      sessionStorage.setItem("role", role);
+      sessionStorage.setItem("loggedIn", "true");
 
       onLogin();
       navigate(role === "ADMIN" ? "/admin" : "/");
@@ -47,7 +48,8 @@ function LoginPage({ onLogin, loggedIn }) {
     }
   };
 
-  if (loggedIn) {
+  // ✅ 判斷是否已登入也應該使用 sessionStorage
+  if (loggedIn || sessionStorage.getItem("loggedIn") === "true") {
     return <Navigate to="/" replace />;
   }
 

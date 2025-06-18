@@ -30,14 +30,14 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { logout, checkLogin } from './api/userApi';
 
 function App() {
-  const [loggedIn, setLoggedIn] = useState(() => localStorage.getItem("loggedIn") === "true");
-  const [role, setRole] = useState(localStorage.getItem("role") || "");
+  const [loggedIn, setLoggedIn] = useState(() => sessionStorage.getItem("loggedIn") === "true");
+  const [role, setRole] = useState(sessionStorage.getItem("role") || "");
 
   const handleLogout = async () => {
     await logout();
     setLoggedIn(false);
     setRole("");
-    localStorage.clear();
+    sessionStorage.clear();
     alert('已登出');
   };
 
@@ -45,13 +45,12 @@ function App() {
     checkLogin().then(res => {
       if (res.status === 200 && res.data === true) {
         setLoggedIn(true);
-        localStorage.setItem("loggedIn", "true");
-        const storedRole = localStorage.getItem("role");
+        sessionStorage.setItem("loggedIn", "true");
+        const storedRole = sessionStorage.getItem("role");
         if (storedRole) setRole(storedRole);
       }
     });
   }, []);
-
 
   return (
     <Router>
@@ -63,7 +62,7 @@ function App() {
         <div className="flex flex-wrap gap-x-4 justify-center md:justify-start">
           {!loggedIn ? (
             <Link to="/products" className="hover:underline">所有商品</Link>
-          ):(
+          ) : (
             <>
               {role === "USER" && (
                 <>
@@ -93,9 +92,7 @@ function App() {
             <>
               <button onClick={handleLogout} className="bg-gray-800 text-white px-3 py-1 rounded">登出</button>
               {role !== "ADMIN" && (
-                <>
-                  <Link to="/cart" className="border px-2 py-1 rounded">購物車</Link>
-                </>
+                <Link to="/cart" className="border px-2 py-1 rounded">購物車</Link>
               )}
             </>
           )}
@@ -111,8 +108,9 @@ function App() {
               <LoginPage
                 onLogin={() => {
                   setLoggedIn(true);
-                  setRole(localStorage.getItem("role"));
-                  localStorage.setItem('loggedIn', 'true');
+                  const roleFromSession = sessionStorage.getItem("role");
+                  setRole(roleFromSession);
+                  sessionStorage.setItem('loggedIn', 'true');
                 }}
                 loggedIn={loggedIn}
               />

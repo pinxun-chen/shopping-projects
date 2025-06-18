@@ -16,7 +16,7 @@ const ProtectedRoute = ({ loggedIn, requiredRole, children }) => {
       } else if (location.pathname.includes("/admin")) {
         message = "請先登入才能進入管理後台！";
       }
-      localStorage.setItem("verifyMessage", message);
+      sessionStorage.setItem("verifyMessage", message); 
     }
   }, [loggedIn, location.pathname]);
 
@@ -24,8 +24,8 @@ const ProtectedRoute = ({ loggedIn, requiredRole, children }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // 檢查角色權限
-  const role = localStorage.getItem("role");
+  // 從 sessionStorage 取角色
+  const role = sessionStorage.getItem("role");
   if (requiredRole && role !== requiredRole) {
     alert("您沒有權限進入此頁面！");
     return <Navigate to="/" replace />;
