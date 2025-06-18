@@ -11,7 +11,10 @@ function OrderAdminPage() {
       const res = await fetch('/api/admin/orders', { credentials: 'include' });
       const data = await res.json();
       if (data.status === 200) {
-        setOrders(data.data);
+        const sorted = [...data.data].sort(
+          (a, b) => new Date(b.orderTime) - new Date(a.orderTime)
+        );
+        setOrders(sorted);
       } else {
         alert(data.message || '查詢失敗');
       }

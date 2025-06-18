@@ -97,8 +97,11 @@ const ProductListPage = () => {
       {/* 商品列表 */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {filteredProducts.map(product => (
-          <div key={product.id} className="border rounded-lg shadow p-4 flex flex-col hover:shadow-lg transition h-96 cursor-pointer"
-            onClick={() => navigate(`/products/${product.id}`)}>
+          <div
+            key={product.id}
+            className="border rounded-xl shadow hover:shadow-lg transition flex flex-col p-4 h-96 relative cursor-pointer bg-white"
+            onClick={() => navigate(`/products/${product.id}`)}
+          >
             <img
               src={
                 product.imageUrl?.startsWith('http')
@@ -108,22 +111,27 @@ const ProductListPage = () => {
                     : '/assets/no-image.png'
               }
               alt={product.name}
-              className="h-48 object-cover rounded mb-3"
+              className="h-48 object-cover rounded mb-3 border"
             />
-            <h3 className="text-lg font-semibold">{product.name}</h3>
-            <p className="text-sm text-gray-600 mb-1">價格: ${product.price}</p>
-            <p className="text-sm mb-3">分類: {product.categoryName || '無'}</p>
+
+            <div className="flex-1 flex flex-col">
+              <h3 className="text-base font-semibold mb-1 line-clamp-2">{product.name}</h3>
+              <p className="text-sm text-gray-600 mb-1">價格: ${product.price}</p>
+              <p className="text-sm text-gray-500 mb-3">分類: {product.categoryName || '無'}</p>
+            </div>
+
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 navigate(`/products/${product.id}`);
               }}
-              className="mt-auto bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+              className="mt-auto bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full"
             >
-              加入購物車
+              查看商品
             </button>
           </div>
         ))}
+
       </div>
 
       {/* 空狀態 */}

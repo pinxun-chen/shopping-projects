@@ -60,7 +60,11 @@ const CartPage = () => {
           key={item.id}
           className="bg-white border rounded-lg shadow-md p-4 mb-4 flex flex-col sm:flex-row sm:items-center justify-between transition hover:shadow-lg w-full max-w-2xl mx-auto">
           <img
-            src={item.imageUrl || "/assets/no-image.png"}
+            src={
+              item.imageUrl?.startsWith('http')
+                ? item.imageUrl
+                : `http://localhost:8082${item.imageUrl || '/assets/no-image.png'}`
+            }
             alt={item.productName}
             className="w-32 h-32 object-cover rounded"
           />

@@ -101,7 +101,11 @@ const OrderListPage = () => {
                 {order.items.map((item, index) => (
                   <div key={`${item.productId}-${index}`} className="flex justify-end items-center mb-2 gap-2">
                     <img
-                      src={item.imageUrl || "/assets/no-image.png"}
+                      src={
+                        item.imageUrl?.startsWith('http')
+                          ? item.imageUrl
+                          : `http://localhost:8082${item.imageUrl || '/assets/no-image.png'}`
+                      }
                       alt={item.productName}
                       className="w-12 h-12 object-cover rounded"
                     />

@@ -85,7 +85,11 @@ const OrderDetailPage = () => {
         {order.items?.map((item, idx) => (
           <div key={`${item.productId}-${idx}`} className="flex items-center mb-3 gap-4">
             <img
-              src={item.imageUrl || '/assets/no-image.png'}
+              src={
+                item.imageUrl?.startsWith('http')
+                  ? item.imageUrl
+                  : `http://localhost:8082${item.imageUrl || '/assets/no-image.png'}`
+              }
               alt={item.productName}
               className="w-16 h-16 object-cover rounded border"
             />
