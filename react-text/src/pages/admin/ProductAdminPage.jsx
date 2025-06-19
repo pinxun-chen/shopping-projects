@@ -64,10 +64,16 @@ function ProductAdminPage() {
             <tr key={p.id} className="hover:bg-gray-50">
               <td className="border px-4 py-2">
                 <img
-                  src={p.imageUrl.startsWith('http') ? p.imageUrl : `http://localhost:8082${p.imageUrl}`}
-                  alt={p.name}
+                  src={
+                    typeof p.imageUrl === 'string' && p.imageUrl.startsWith('http')
+                      ? p.imageUrl
+                      : p.imageUrl
+                      ? `http://localhost:8082${p.imageUrl}`
+                      : '/default.jpg'
+                  }
+                  alt={p.name || '商品圖片'}
                   className="w-16 h-16 object-cover"
-                /> 
+                />
               </td>
               <td className="border px-4 py-2">{p.name}</td>
               <td className="border px-4 py-2">{p.categoryName}</td>
@@ -84,15 +90,6 @@ function ProductAdminPage() {
           ))}
         </tbody>
       </table>
-
-      {/* <div className="mt-6 text-center">
-        <button
-          onClick={() => navigate('/admin')}
-          className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800"
-        >
-          返回後台管理
-        </button>
-      </div> */}
     </div>
   );
 }

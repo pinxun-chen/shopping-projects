@@ -62,15 +62,16 @@ function ProductDetailPage() {
     formData.append("file", file);
 
     try {
-      const res = await fetch("http://localhost:8082/api/upload", {
+      const res = await fetch("/api/products/upload-image", {
         method: "POST",
         body: formData,
+        credentials: 'include'
       });
       const data = await res.json();
       if (data.status === 200) {
         setEditForm((prev) => ({
           ...prev,
-          imageUrl: data.imageUrl,
+          imageUrl: data.data.imageUrl,
         }));
         alert("圖片上傳成功！");
       } else {
@@ -218,14 +219,20 @@ function ProductDetailPage() {
 
       <div className="mb-6 text-center">
         <img
-          src={editForm.imageUrl?.startsWith('http') ? editForm.imageUrl : `http://localhost:8082${editForm.imageUrl}`}
-          alt={editForm.name}
+          src={
+            typeof editForm.imageUrl === 'string' && editForm.imageUrl.startsWith('http')
+              ? editForm.imageUrl
+              : editForm.imageUrl
+              ? `http://localhost:8082${editForm.imageUrl}`
+              : '/default.jpg'
+          }
+          alt={editForm.name || '商品圖片'}
           className="w-32 h-32 object-cover mx-auto mb-2"
         />
 
         <div className="text-left space-y-2">
 
-          <label className="block font-semibold">上傳新圖片：</label>
+          {/* <label className="block font-semibold">上傳新圖片：</label>
           <div className="flex items-center space-x-2">
             <input
               id="fileInput"
@@ -243,7 +250,7 @@ function ProductDetailPage() {
             <span className="text-sm text-gray-700">
               {editForm.imageUrl ? editForm.imageUrl.split('/').pop() : '未選擇檔案'}
             </span>
-          </div>
+          </div> */}
 
           <label className="block font-semibold">名稱：</label>
           <input className="border px-2 py-1 w-full" name="name" value={editForm.name} onChange={handleEditChange} />
