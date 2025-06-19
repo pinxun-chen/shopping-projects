@@ -30,12 +30,22 @@ const CheckoutPage = () => {
   }, []);
 
   const fetchCart = async () => {
-    const uid = sessionStorage.getItem('userId');
-    if (!uid) {
-      console.warn('尚未登入，無法載入購物車');
-      return;
-    }
     try {
+      // 取得登入者資訊
+      const userRes = await fetch('http://localhost:8082/api/users/me', {
+        credentials: 'include',
+      });
+      const userResult = await userRes.json();
+
+      if (userResult.status !== 200 || !userResult.data?.userId) {
+        console.warn('尚未登入，無法載入購物車');
+        setError('尚未登入，請重新登入後再試');
+        return;
+      }
+
+      const uid = userResult.data.userId;
+
+      // 取得購物車
       const res = await fetch(`${API_URL}/${uid}`, { credentials: 'include' });
       const result = await res.json();
       const items = result.data || [];
@@ -49,6 +59,7 @@ const CheckoutPage = () => {
       setError('載入購物車資料失敗');
     }
   };
+
 
   const fetchShippingFee = async (amount) => {
     try {

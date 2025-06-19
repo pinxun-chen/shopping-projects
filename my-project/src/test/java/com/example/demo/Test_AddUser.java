@@ -26,7 +26,7 @@ public class Test_AddUser {
         user.setEmail("a930406a@gmail.com");
         user.setActive(true);
         user.setRole("ADMIN");
-
+        user.setBlocked(false);
         userRepository.save(user);
         System.out.println("新增使用者成功！");
     }

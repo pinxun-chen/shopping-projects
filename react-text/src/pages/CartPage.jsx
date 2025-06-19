@@ -8,20 +8,28 @@ const CartPage = () => {
 
   // 讀取購物車資料
   const fetchCart = async () => {
-    const uid = sessionStorage.getItem("userId"); 
-    if (!uid) {
-      console.warn("尚未登入，無法載入購物車");
-      return;
-    }
     try {
-      const res = await fetch(`${API_URL}/${uid}`,{
+      // 從後端取得 userId
+      const userRes = await fetch('http://localhost:8082/api/users/me', {
+        credentials: 'include',
+      });
+      const userResult = await userRes.json();
+
+      if (userResult.status !== 200 || !userResult.data?.userId) {
+        console.warn('尚未登入，無法載入購物車');
+        return;
+      }
+
+      const uid = userResult.data.userId;
+
+      const res = await fetch(`${API_URL}/${uid}`, {
         method: 'GET',
-        credentials: 'include' 
+        credentials: 'include',
       });
       const result = await res.json();
       setCartItems(result.data || []);
     } catch (err) {
-      console.error("購物車載入失敗:", err);
+      console.error('購物車載入失敗:', err);
     }
   };
 
@@ -42,10 +50,13 @@ const CartPage = () => {
 
   // 刪除項目
   const deleteItem = async (cartItemId) => {
-    await fetch(`${API_URL}/${cartItemId}`, { method: 'DELETE', credentials: 'include', });
+    await fetch(`${API_URL}/${cartItemId}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    });
     fetchCart();
   };
-  
+
   const total = cartItems.reduce((sum, item) => sum + item.subtotal, 0);
 
   const handleCheckoutClick = () => {
@@ -58,7 +69,8 @@ const CartPage = () => {
       {cartItems.map((item) => (
         <div
           key={item.id}
-          className="bg-white border rounded-lg shadow-md p-4 mb-4 flex flex-col sm:flex-row sm:items-center justify-between transition hover:shadow-lg w-full max-w-2xl mx-auto">
+          className="bg-white border rounded-lg shadow-md p-4 mb-4 flex flex-col sm:flex-row sm:items-center justify-between transition hover:shadow-lg w-full max-w-2xl mx-auto"
+        >
           <img
             src={
               item.imageUrl?.startsWith('http')
@@ -106,7 +118,7 @@ const CartPage = () => {
         總金額：${total}
         {total < 2000 ? (
           <p className="text-sm text-gray-600 mt-1">
-            (滿2000免運)再消費 NT$ {2000 - total} 可享免運優惠 
+            (滿2000免運)再消費 NT$ {2000 - total} 可享免運優惠
           </p>
         ) : (
           <p className="text-sm text-green-600 mt-1">已達免運標準</p>
@@ -114,16 +126,15 @@ const CartPage = () => {
       </div>
       {cartItems.length > 0 && (
         <div className="mt-6 text-right">
-              <button
-                onClick={handleCheckoutClick}
-                className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
-              >
-                前往結帳
-              </button>
-            </div>
-          )}
+          <button
+            onClick={handleCheckoutClick}
+            className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
+          >
+            前往結帳
+          </button>
         </div>
-      
+      )}
+    </div>
   );
 };
 

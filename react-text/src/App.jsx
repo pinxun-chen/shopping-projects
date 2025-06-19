@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 import './App.css';
 
-// 頁面元件
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
@@ -30,31 +29,34 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { logout, checkLogin } from './api/userApi';
 
 function App() {
-  const [loggedIn, setLoggedIn] = useState(() => sessionStorage.getItem("loggedIn") === "true");
-  const [role, setRole] = useState(sessionStorage.getItem("role") || "");
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [role, setRole] = useState('');
 
   const handleLogout = async () => {
     await logout();
     setLoggedIn(false);
-    setRole("");
-    sessionStorage.clear();
+    setRole('');
     alert('已登出');
   };
 
   useEffect(() => {
     checkLogin().then(res => {
-      if (res.status === 200 && res.data === true) {
-        setLoggedIn(true);
-        sessionStorage.setItem("loggedIn", "true");
-        const storedRole = sessionStorage.getItem("role");
-        if (storedRole) setRole(storedRole);
+      if (res.status === 200 && res.data) {
+        const { loggedIn, role } = res.data;
+        setLoggedIn(loggedIn);
+        setRole(role || '');
+      } else {
+        setLoggedIn(false);
+        setRole('');
       }
+    }).catch(() => {
+      setLoggedIn(false);
+      setRole('');
     });
   }, []);
 
   return (
     <Router>
-      {/* 導覽列 */}
       <nav className="bg-white border-b p-4 flex flex-col md:flex-row md:justify-between md:items-center gap-y-2 gap-x-4 shadow-sm flex-wrap">
         <div className="text-xl font-bold">
           <Link to="/">Home</Link>
@@ -106,11 +108,9 @@ function App() {
           <Route path="/login" element={
             loggedIn ? <Navigate to="/" replace /> : (
               <LoginPage
-                onLogin={() => {
+                onLogin={(serverRole) => {
                   setLoggedIn(true);
-                  const roleFromSession = sessionStorage.getItem("role");
-                  setRole(roleFromSession);
-                  sessionStorage.setItem('loggedIn', 'true');
+                  setRole(serverRole);
                 }}
                 loggedIn={loggedIn}
               />
@@ -121,7 +121,7 @@ function App() {
           <Route path="/reset" element={<ResetPasswordPage />} />
           <Route path="/verify" element={<VerifyPage />} />
 
-          {/* 使用者專屬頁面（USER） */}
+          {/* USER 專屬 */}
           <Route path="/products" element={<ProductListPage />} />
           <Route path="/products/:id" element={<ProductDetailPageUser />} />
           <Route path="/cart" element={
@@ -150,12 +150,7 @@ function App() {
             </ProtectedRoute>
           } />
 
-          {/* 管理員專屬頁面（ADMIN） */}
-          {/* <Route path="/admin" element={
-            <ProtectedRoute loggedIn={loggedIn} requiredRole="ADMIN">
-              <AdminDashboard />
-            </ProtectedRoute>
-          } /> */}
+          {/* ADMIN 專屬 */}
           <Route path="/admin/products" element={
             <ProtectedRoute loggedIn={loggedIn} requiredRole="ADMIN">
               <ProductAdminPage />

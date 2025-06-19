@@ -15,5 +15,7 @@ public interface UserService {
     boolean resetPassword(String token, String newPassword); // 重設密碼
     boolean deleteUser(String username); // 刪除帳號
     boolean resendVerificationEmail(String username); // 註冊重新發送驗證信
+    boolean blockUser(String username);
+    boolean unblockUser(String username);
 
 }

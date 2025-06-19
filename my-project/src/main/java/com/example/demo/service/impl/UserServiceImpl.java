@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
         String hash = Hash.getHash(password, salt);
 
         // 建立使用者
-        User user = new User(null, username, hash, salt, email, false, "USER");
+        User user = new User(null, username, hash, salt, email, false, "USER", false);
         userRepository.save(user);
         
         // 建立驗證 Token
@@ -215,6 +215,31 @@ public class UserServiceImpl implements UserService {
         return true;
     }
 
+    // 封鎖使用者
+    @Override
+    public boolean blockUser(String username) {
+        Optional<User> userOpt = userRepository.findByUsername(username);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            user.setBlocked(true);
+            userRepository.save(user);
+            return true;
+        }
+        return false;
+    }
+
+    // 解除封鎖使用者
+    @Override
+    public boolean unblockUser(String username) {
+        Optional<User> userOpt = userRepository.findByUsername(username);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            user.setBlocked(false);
+            userRepository.save(user);
+            return true;
+        }
+        return false;
+    }
 
     
 }

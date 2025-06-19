@@ -40,4 +40,7 @@ public class User {
 	@Column(name = "role", nullable = false)
 	private String role;
 	
+	@Column(name = "blocked", nullable = false)
+	private Boolean blocked = false;
+	
 }

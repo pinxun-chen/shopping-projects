@@ -36,9 +36,13 @@ public class CertServiceImpl implements CertService {
             throw new CertException("帳號尚未啟用，請先完成信箱驗證");
         }
 		
-		// 4. 簽發憑證
-		UserCert userCert = new UserCert(user.getUserId(), user.getUsername(), user.getRole());
-		return userCert;
+		 // 4. 檢查是否被封鎖
+	    if (Boolean.TRUE.equals(user.getBlocked())) {
+	        throw new CertException("此帳號已被封鎖，無法登入");
+	    }
+
+	    // 5. 簽發憑證
+	    return new UserCert(user.getUserId(), user.getUsername(), user.getRole());
 	}
 	
 }

@@ -21,6 +21,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     // 檢查帳號是否已存在（可用於註冊驗證）
     boolean existsByUsername(String username);
     
-    @Query(value = "select user_id, username, password_hash, salt, email, active, role from users where username=:username", nativeQuery = true)
+    @Query(value = "select user_id, username, password_hash, salt, email, active, role, blocked from users where username=:username", nativeQuery = true)
 	User getUser(String username);
 }

@@ -1,6 +1,11 @@
 package com.example.demo.controller;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -95,6 +100,24 @@ public class ProductController {
         return ResponseEntity.ok(ApiResponse.success("新增成功", savedDto));
     }
 
+    // 單純上傳圖片（給商品編輯頁使用）
+    @PostMapping("/upload-image")
+    public ResponseEntity<ApiResponse<String>> uploadImage(@RequestParam MultipartFile file) {
+        try {
+            String uploadDir = "uploads/";
+            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+            Path uploadPath = Paths.get(uploadDir);
+            Files.createDirectories(uploadPath);
+
+            Path filePath = uploadPath.resolve(fileName);
+            Files.write(filePath, file.getBytes());
+
+            String imageUrl = "/uploads/" + fileName;
+            return ResponseEntity.ok(ApiResponse.success("圖片上傳成功", imageUrl));
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body(ApiResponse.error(500, "圖片上傳失敗：" + e.getMessage()));
+        }
+    }
     
 }
 

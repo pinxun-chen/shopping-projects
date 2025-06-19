@@ -10,7 +10,7 @@ function LoginPage({ onLogin, loggedIn }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const msg = sessionStorage.getItem('verifyMessage');
+    const msg = sessionStorage.getItem('verifyMessage'); // 保留這裡用來顯示註冊後的驗證提示
     if (msg) {
       setMessage(msg);
       sessionStorage.removeItem('verifyMessage');
@@ -32,24 +32,16 @@ function LoginPage({ onLogin, loggedIn }) {
     const result = await login(form.username, form.password, form.captcha);
 
     if (result.status === 200) {
-      const { userId, username, role } = result.data;
-
-      // ✅ 改用 sessionStorage 儲存登入資訊（不會跨分頁共用）
-      sessionStorage.setItem("userId", userId);
-      sessionStorage.setItem("username", username);
-      sessionStorage.setItem("role", role);
-      sessionStorage.setItem("loggedIn", "true");
-
-      onLogin();
-      navigate(role === "ADMIN" ? "/admin" : "/");
+      const { role } = result.data;
+      onLogin(role);
+      navigate(role === "ADMIN" ? "/admin/products" : "/");
     } else {
       setError(result.message || '登入失敗');
       refreshCaptcha();
     }
   };
 
-  // ✅ 判斷是否已登入也應該使用 sessionStorage
-  if (loggedIn || sessionStorage.getItem("loggedIn") === "true") {
+  if (loggedIn) {
     return <Navigate to="/" replace />;
   }
 
@@ -79,25 +71,19 @@ function LoginPage({ onLogin, loggedIn }) {
         {error && <p style={{ color: 'red', fontWeight: 'bold' }}>{error}</p>}
 
         <div>
-          <label style={{ fontWeight: 'bold', marginBottom: '6px', display: 'block' }}>使用者名稱</label>
+          <label style={{ fontWeight: 'bold', display: 'block' }}>使用者名稱</label>
           <input
             name="username"
             value={form.username}
             onChange={handleChange}
             placeholder="帳號"
             required
-            style={{
-              width: '100%',
-              padding: '10px',
-              fontSize: '16px',
-              border: '1px solid #ccc',
-              borderRadius: '6px'
-            }}
+            style={{ width: '100%', padding: '10px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '6px' }}
           />
         </div>
 
         <div>
-          <label style={{ fontWeight: 'bold', marginBottom: '6px', display: 'block' }}>密碼</label>
+          <label style={{ fontWeight: 'bold', display: 'block' }}>密碼</label>
           <input
             name="password"
             type="password"
@@ -105,18 +91,12 @@ function LoginPage({ onLogin, loggedIn }) {
             onChange={handleChange}
             placeholder="密碼"
             required
-            style={{
-              width: '100%',
-              padding: '10px',
-              fontSize: '16px',
-              border: '1px solid #ccc',
-              borderRadius: '6px'
-            }}
+            style={{ width: '100%', padding: '10px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '6px' }}
           />
         </div>
 
         <div>
-          <label style={{ fontWeight: 'bold', marginBottom: '6px', display: 'block' }}>驗證碼</label>
+          <label style={{ fontWeight: 'bold', display: 'block' }}>驗證碼</label>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <input
               name="captcha"
@@ -124,36 +104,18 @@ function LoginPage({ onLogin, loggedIn }) {
               onChange={handleChange}
               placeholder="驗證碼"
               required
-              style={{
-                flex: 1,
-                padding: '10px',
-                fontSize: '16px',
-                border: '1px solid #ccc',
-                borderRadius: '6px'
-              }}
+              style={{ flex: 1, padding: '10px', fontSize: '16px', border: '1px solid #ccc', borderRadius: '6px' }}
             />
             <img
               src={captchaUrl}
               alt="驗證碼"
-              style={{
-                height: '40px',
-                marginLeft: '10px',
-                borderRadius: '4px',
-                border: '1px solid #ccc'
-              }}
+              style={{ height: '40px', marginLeft: '10px', borderRadius: '4px', border: '1px solid #ccc' }}
             />
             <button
               type="button"
               onClick={refreshCaptcha}
               title="重新整理驗證碼"
-              style={{
-                marginLeft: '6px',
-                backgroundColor: 'transparent',
-                borderRadius: '4px',
-                padding: '6px 8px',
-                fontSize: '14px',
-                cursor: 'pointer'
-              }}
+              style={{ marginLeft: '6px', backgroundColor: 'transparent', borderRadius: '4px', padding: '6px 8px', fontSize: '14px', cursor: 'pointer' }}
             >🔄</button>
           </div>
         </div>

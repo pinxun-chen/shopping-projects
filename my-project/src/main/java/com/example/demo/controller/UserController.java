@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.Optional;
 
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
@@ -52,20 +53,6 @@ public class UserController {
             return ResponseEntity
                     .badRequest()
                     .body(ApiResponse.error(400, "使用者名稱已存在!"));
-        }
-    }
-
-
-    // 依 ID 查詢使用者
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<?>> getUserById(@PathVariable Integer id) {
-        Optional<UserDto> userOpt = userService.getUserById(id);
-        if (userOpt.isPresent()) {
-            return ResponseEntity.ok(ApiResponse.success("查詢成功", userOpt.get()));
-        } else {
-            return ResponseEntity
-                    .status(404)
-                    .body(ApiResponse.error(404, "找不到使用者"));
         }
     }
 
@@ -179,9 +166,20 @@ public class UserController {
 	}
 	
 	@GetMapping("/check-login")
-	public ResponseEntity<ApiResponse<Boolean>> checkLogin(HttpSession session) {
-	    boolean loggedIn = session.getAttribute("userCert") != null;
-	    return ResponseEntity.ok(ApiResponse.success("檢查登入", loggedIn));
+	public ResponseEntity<ApiResponse<?>> checkLogin(HttpSession session) {
+	    UserCert cert = (UserCert) session.getAttribute("userCert");
+
+	    if (cert == null) {
+	        return ResponseEntity.ok(ApiResponse.success("尚未登入", 
+	            Map.of("loggedIn", false)));
+	    }
+
+	    return ResponseEntity.ok(ApiResponse.success("登入中", 
+	        Map.of(
+	            "loggedIn", true,
+	            "role", cert.getRole()
+	        )
+	    ));
 	}
 	
 	// 刪除帳號
@@ -230,6 +228,41 @@ public class UserController {
 	    dto.setRole(cert.getRole());
 	    return ResponseEntity.ok(ApiResponse.success("查詢成功", dto));
 	}
+	
+	// 封鎖帳號
+	@PutMapping("/block/{username}")
+	public ResponseEntity<ApiResponse<Void>> blockUser(@PathVariable String username) {
+	    boolean success = userService.blockUser(username);
+	    if (success) {
+	        return ResponseEntity.ok(ApiResponse.success("帳號已封鎖", null));
+	    } else {
+	        return ResponseEntity.status(404).body(ApiResponse.error(404, "找不到該帳號"));
+	    }
+	}
+
+	// 解除封鎖帳號
+	@PutMapping("/unblock/{username}")
+	public ResponseEntity<ApiResponse<Void>> unblockUser(@PathVariable String username) {
+	    boolean success = userService.unblockUser(username);
+	    if (success) {
+	        return ResponseEntity.ok(ApiResponse.success("帳號已解除封鎖", null));
+	    } else {
+	        return ResponseEntity.status(404).body(ApiResponse.error(404, "找不到該帳號"));
+	    }
+	}
+	
+	// 依 ID 查詢使用者
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<?>> getUserById(@PathVariable Integer id) {
+        Optional<UserDto> userOpt = userService.getUserById(id);
+        if (userOpt.isPresent()) {
+            return ResponseEntity.ok(ApiResponse.success("查詢成功", userOpt.get()));
+        } else {
+            return ResponseEntity
+                    .status(404)
+                    .body(ApiResponse.error(404, "找不到使用者"));
+        }
+    }
 	
 }
 

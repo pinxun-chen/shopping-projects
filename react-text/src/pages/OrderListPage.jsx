@@ -4,6 +4,26 @@ const OrderListPage = () => {
   const [orders, setOrders] = useState([]);
   const [loggedIn, setLoggedIn] = useState(true);
 
+  // 呼叫 /api/users/me 取得 userId
+  const fetchCurrentUser = async () => {
+    try {
+      const res = await fetch('/api/users/me', {
+        credentials: 'include',
+      });
+      const result = await res.json();
+
+      if (res.status === 200) {
+        const userId = result.data.userId;
+        fetchOrders(userId);
+      } else {
+        setLoggedIn(false);
+      }
+    } catch (err) {
+      console.error('無法取得使用者資訊', err);
+      setLoggedIn(false);
+    }
+  };
+
   const fetchOrders = async (userId) => {
     try {
       const res = await fetch(`http://localhost:8082/api/order/${userId}`, {
@@ -26,12 +46,7 @@ const OrderListPage = () => {
   };
 
   useEffect(() => {
-    const uid = sessionStorage.getItem('userId');
-    if (!uid) {
-      setLoggedIn(false);
-      return;
-    }
-    fetchOrders(uid);
+    fetchCurrentUser(); // ⬅️ 登入狀態確認並取得 userId
   }, []);
 
   if (!loggedIn) {
@@ -48,6 +63,7 @@ const OrderListPage = () => {
     );
   }
 
+  // 以下畫面與原本一致
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">訂單列表</h2>

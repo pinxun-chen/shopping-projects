@@ -62,29 +62,31 @@ const UserAdminPage = () => {
     }
   };
 
-  const deleteUser = async (username) => {
+  const toggleBlockUser = async (username, isBlocked) => {
     if (username === currentUsername) {
-      alert(" 不能封鎖自己帳號！");
+      alert("不能封鎖自己帳號！");
       return;
     }
 
-    const confirm = window.confirm(`確定要封鎖使用者「${username}」？此操作不可恢復。`);
+    const action = isBlocked ? "解除封鎖" : "封鎖";
+    const apiPath = isBlocked ? "unblock" : "block";
+    const confirm = window.confirm(`確定要${action}使用者「${username}」？`);
     if (!confirm) return;
 
     try {
-      const res = await fetch(`/api/admin/users/delete/${username}`, {
-        method: "DELETE",
+      const res = await fetch(`/api/users/${apiPath}/${username}`, {
+        method: "PUT",
         credentials: "include",
       });
       const result = await res.json();
       if (res.status === 200) {
-        alert("帳號已成功封鎖");
+        alert(`帳號已${action}`);
         fetchUsers();
       } else {
-        alert(result.message || "封鎖失敗");
+        alert(result.message || `${action}失敗`);
       }
     } catch (err) {
-      alert("封鎖錯誤：" + err.message);
+      alert(`${action}錯誤：` + err.message);
     }
   };
 
@@ -126,18 +128,26 @@ const UserAdminPage = () => {
               <td className="border px-4 py-2">{user.role}</td>
               <td className="border px-4 py-2">{user.active ? "True" : "False"}</td>
               <td className="border px-4 py-2 space-x-2">
-                <button
-                  onClick={() => toggleRole(user.userId, user.role)}
-                  className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
-                >
-                  {user.role === "USER" ? "升為管理者" : "降為用戶"}
-                </button>
-                <button
-                  onClick={() => deleteUser(user.username)}
-                  className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
-                >
-                  封鎖
-                </button>
+                {user.userId !== 1 && (
+                  <>
+                    <button
+                      onClick={() => toggleRole(user.userId, user.role)}
+                      className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                    >
+                      {user.role === "USER" ? "升為管理者" : "降為用戶"}
+                    </button>
+                    <button
+                      onClick={() => toggleBlockUser(user.username, user.blocked)}
+                      className={`${
+                        user.blocked
+                          ? "bg-green-500 hover:bg-green-600"
+                          : "bg-red-500 hover:bg-red-600"
+                      } text-white px-2 py-1 rounded`}
+                    >
+                      {user.blocked ? "解除封鎖" : "封鎖"}
+                    </button>
+                  </>
+                )}
               </td>
             </tr>
           ))}
