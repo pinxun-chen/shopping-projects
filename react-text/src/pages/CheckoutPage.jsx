@@ -30,7 +30,7 @@ const CheckoutPage = () => {
   }, []);
 
   const fetchCart = async () => {
-    const uid = localStorage.getItem('userId');
+    const uid = sessionStorage.getItem('userId');
     if (!uid) {
       console.warn('尚未登入，無法載入購物車');
       return;
