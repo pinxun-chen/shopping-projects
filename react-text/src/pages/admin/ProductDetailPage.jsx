@@ -71,7 +71,7 @@ function ProductDetailPage() {
       if (data.status === 200) {
         setEditForm((prev) => ({
           ...prev,
-          imageUrl: data.data.imageUrl,
+          imageUrl: data.data,
         }));
         alert("圖片上傳成功！");
       } else {
@@ -232,7 +232,7 @@ function ProductDetailPage() {
 
         <div className="text-left space-y-2">
 
-          {/* <label className="block font-semibold">上傳新圖片：</label>
+          <label className="block font-semibold">上傳新圖片：</label>
           <div className="flex items-center space-x-2">
             <input
               id="fileInput"
@@ -245,15 +245,21 @@ function ProductDetailPage() {
               htmlFor="fileInput"
               className="cursor-pointer bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 min-w-[120px] text-center"
             >
-              選擇圖片
+              選擇檔案
             </label>
             <span className="text-sm text-gray-700">
               {editForm.imageUrl ? editForm.imageUrl.split('/').pop() : '未選擇檔案'}
             </span>
-          </div> */}
+          </div>
 
           <label className="block font-semibold">名稱：</label>
           <input className="border px-2 py-1 w-full" name="name" value={editForm.name} onChange={handleEditChange} />
+
+          <label className="block font-semibold">描述：</label>
+          <textarea className="border px-2 py-1 w-full" name="description" value={editForm.description} onChange={handleEditChange} />
+
+          <label className="block font-semibold">價格：</label>
+          <input type="number" className="border px-2 py-1 w-full" name="price" value={editForm.price} onChange={handleEditChange} />
 
           <label className="block font-semibold">分類：</label>
           <select
@@ -270,11 +276,9 @@ function ProductDetailPage() {
             ))}
           </select>
 
-          <label className="block font-semibold">價格：</label>
-          <input type="number" className="border px-2 py-1 w-full" name="price" value={editForm.price} onChange={handleEditChange} />
+         
 
-          <label className="block font-semibold">描述：</label>
-          <textarea className="border px-2 py-1 w-full" name="description" value={editForm.description} onChange={handleEditChange} />
+          
         </div>
 
         <button

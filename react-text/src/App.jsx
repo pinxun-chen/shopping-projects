@@ -15,7 +15,6 @@ import ProductDetailPageUser from './pages/user/ProductDetailPageUser';
 import CartPage from './pages/CartPage';
 import OrderListPage from './pages/OrderListPage';
 import CheckoutPage from './pages/CheckoutPage';
-import AdminDashboard from './pages/AdminDashboard';
 import ProductAdminPage from './pages/admin/ProductAdminPage';
 import ProductFormPage from './pages/admin/ProductFormPage';
 import ProductDetailPage from './pages/admin/ProductDetailPage';
