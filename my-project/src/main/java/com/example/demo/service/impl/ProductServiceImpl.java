@@ -246,5 +246,22 @@ public class ProductServiceImpl implements ProductService {
             throw new RuntimeException("圖片儲存失敗：" + e.getMessage());
         }
     }
+    
+    @Override
+    public String uploadImage(MultipartFile file) {
+        try {
+            String uploadDir = "uploads/";
+            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+            Path uploadPath = Paths.get(uploadDir);
+            Files.createDirectories(uploadPath);
+
+            Path filePath = uploadPath.resolve(fileName);
+            Files.write(filePath, file.getBytes());
+
+            return "/uploads/" + fileName;
+        } catch (IOException e) {
+            throw new RuntimeException("圖片上傳失敗：" + e.getMessage());
+        }
+    }
 
 }
