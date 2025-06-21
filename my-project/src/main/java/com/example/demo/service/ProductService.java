@@ -21,4 +21,7 @@ public interface ProductService {
     void updateProductWithVariants(ProductDto dto);
     ProductDto createProductWithImage(String name, String description, Integer price, Integer categoryId, MultipartFile imageFile);
     String uploadImage(MultipartFile file);
+    
+    // ai
+    List<ProductDto> searchProductsForPrompt(String prompt);
 }

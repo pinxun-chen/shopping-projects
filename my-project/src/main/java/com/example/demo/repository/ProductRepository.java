@@ -13,5 +13,8 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     List<Product> findByCategoryId(Integer categoryId);
     long countByCategoryId(Integer categoryId);
     List<Product> findByCategory(Category category);
+    
+    // 新增：依商品名稱模糊查詢（忽略大小寫）
+    List<Product> findByNameContainingIgnoreCase(String keyword);
 
 }

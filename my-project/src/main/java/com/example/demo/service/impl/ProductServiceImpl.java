@@ -264,4 +264,21 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+	@Override
+	public List<ProductDto> searchProductsForPrompt(String prompt) {
+	    // 自動比對分類名稱（包含就算符合）
+	    List<Category> matchedCategories = categoryRepository.findAll().stream()
+	            .filter(cat -> prompt.contains(cat.getName()))
+	            .toList();
+
+	    if (matchedCategories.isEmpty()) {
+	        return List.of();
+	    }
+
+	    List<Product> products = productRepository.findByCategory(matchedCategories.get(0));
+	    return products.stream()
+	            .map(p -> modelMapper.map(p, ProductDto.class))
+	            .toList();
+	}
+
 }

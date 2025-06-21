@@ -5,10 +5,10 @@ import com.example.demo.response.ApiResponse;
 import com.example.demo.service.AiService;
 
 import jakarta.servlet.http.HttpSession;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -50,10 +50,35 @@ public class AiApiController {
                     .body(ApiResponse.error(400, "請輸入有效的問題"));
         }
 
-        // 呼叫 AI 模型
-        String reply = aiService.ask(message);
+        // 呼叫 AI 模型，並加入使用者名稱
+        String reply = aiService.askWithUserAndProducts(message, cert.getUsername());
+
+        // 儲存聊天紀錄
+        List<Map<String, String>> chatHistory =
+                (List<Map<String, String>>) session.getAttribute("chatHistory");
+        if (chatHistory == null) chatHistory = new java.util.ArrayList<>();
+
+        chatHistory.add(Map.of("role", "user", "text", message));
+        chatHistory.add(Map.of("role", "bot", "text", reply));
+        session.setAttribute("chatHistory", chatHistory);
+
         return ResponseEntity.ok(
                 ApiResponse.success("回覆成功", Map.of("response", reply))
+        );
+    }
+    
+    @GetMapping("/history")
+    public ResponseEntity<ApiResponse<List<Map<String, String>>>> getChatHistory(HttpSession session) {
+        UserCert cert = (UserCert) session.getAttribute("userCert");
+        if (cert == null) {
+            return ResponseEntity
+                    .status(401)
+                    .body(ApiResponse.error(401, "請先登入會員才能查看紀錄"));
+        }
+        List<Map<String, String>> chatHistory =
+                (List<Map<String, String>>) session.getAttribute("chatHistory");
+        return ResponseEntity.ok(
+                ApiResponse.success("載入成功", chatHistory != null ? chatHistory : List.of())
         );
     }
 }
