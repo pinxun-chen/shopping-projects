@@ -39,7 +39,7 @@ public class ReviewServiceImpl implements ReviewService {
         review.setProduct(product);
         review.setUser(user);
         review.setRating(dto.getRating());
-        review.setComment(dto.getComment());
+        review.setComment(filterBadWords(dto.getComment()));
         review.setUpdatedAt(LocalDateTime.now());
         if (review.getCreatedAt() == null) {
             review.setCreatedAt(LocalDateTime.now());
@@ -75,7 +75,7 @@ public class ReviewServiceImpl implements ReviewService {
 		Optional<ProductReview> optionalReview = reviewRepository.findById(reviewId);
 	    if (optionalReview.isPresent()) {
 	        ProductReview review = optionalReview.get();
-	        review.setReply(reply);
+	        review.setReply(filterBadWords(reply));
 	        reviewRepository.save(review);
 	        return true;
 	    }
@@ -88,7 +88,7 @@ public class ReviewServiceImpl implements ReviewService {
 	    if (optional.isEmpty()) return false;
 
 	    ProductReview review = optional.get();
-	    review.setReply(reply);
+	    review.setReply(filterBadWords(reply));
 	    reviewRepository.save(review);
 	    return true;
 	}
@@ -103,5 +103,16 @@ public class ReviewServiceImpl implements ReviewService {
 	    reviewRepository.save(review);
 	    return true;
 	}
+	
+	// 加入髒話過濾邏輯
+    private String filterBadWords(String content) {
+        if (content == null) return null;
+        List<String> badWords = List.of("幹", "你娘", "去死", "王八蛋", "靠北", "垃圾", "死", "媽的");
+        String filtered = content;
+        for (String word : badWords) {
+            filtered = filtered.replaceAll(word, "**");
+        }
+        return filtered;
+    }
 
 }

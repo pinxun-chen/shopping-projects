@@ -137,12 +137,12 @@ public class AiService {
     }
 
     private boolean containsBadWords(String input) {
-        List<String> badWords = List.of("幹", "你娘", "去死", "王八蛋", "靠北", "垃圾", "死");
+        List<String> badWords = List.of("幹", "你娘", "去死", "王八蛋", "靠北", "垃圾", "死", "媽的");
         return badWords.stream().anyMatch(input::contains);
     }
 
     private String filterBadWords(String content) {
-        List<String> badWords = List.of("幹", "你娘", "去死", "王八蛋", "靠北", "垃圾", "死");
+        List<String> badWords = List.of("幹", "你娘", "去死", "王八蛋", "靠北", "垃圾", "死", "媽的");
         String filtered = content;
         for (String word : badWords) {
             filtered = filtered.replaceAll(word, "**");
