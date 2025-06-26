@@ -8,11 +8,13 @@ const ChatBotPage = () => {
   const [typing, setTyping] = useState(false);
   const navigate = useNavigate();
   const messageEndRef = useRef(null);
+  const eventSourceRef = useRef(null);
 
   const scrollToBottom = () => {
     messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // 取得歷史紀錄
   useEffect(() => {
     const fetchHistory = async () => {
       try {
@@ -20,11 +22,10 @@ const ChatBotPage = () => {
         const result = await res.json();
         if (result.status === 200) {
           const history = result.data || [];
-          if (history.length === 0) {
-            setMessages([{ role: 'bot', text: '您好，我是商城 AI 客服，有什麼可以幫您？' }]);
-          } else {
-            setMessages(history);
-          }
+          setMessages(history.length === 0
+            ? [{ role: 'bot', text: '您好，我是商城 AI 客服，有什麼可以幫您？' }]
+            : history
+          );
         }
       } catch (err) {
         console.error('載入歷史失敗：', err);
@@ -37,64 +38,53 @@ const ChatBotPage = () => {
     scrollToBottom();
   }, [messages]);
 
-  const sendMessage = async () => {
-    if (!input.trim()) return;
+  const sendMessage = () => {
+    if (!input.trim() || loading) return;
 
     const userText = input;
-    setMessages(prev => [...prev, { role: 'user', text: userText }]);
     setInput('');
     setLoading(true);
     setTyping(true);
 
-    try {
-      const eventSource = new EventSource(`/api/ai/chat/stream?message=${encodeURIComponent(userText)}`, {
-        withCredentials: true,
+    // 更新 user 訊息
+    setMessages(prev => {
+      const updated = [...prev, { role: 'user', text: userText }, { role: 'bot', text: '' }];
+      return updated;
+    });
+
+    // 記下 botIndex
+    const botIndex = messages.length + 1;
+    let botMessage = '';
+
+    const es = new EventSource(`/api/ai/chat/stream?message=${encodeURIComponent(userText)}`, {
+      withCredentials: true,
+    });
+    eventSourceRef.current = es;
+
+    es.onmessage = (event) => {
+      botMessage += event.data;
+      setMessages(prev => {
+        const updated = [...prev];
+        updated[botIndex] = { role: 'bot', text: botMessage };
+        return updated;
       });
+    };
 
-      let botMessage = '';
-      const botIndex = messages.length + 1;
-      setMessages(prev => [...prev, { role: 'bot', text: '' }]);
-
-      eventSource.onmessage = (event) => {
-        botMessage += event.data;
-        setMessages(prev => {
-          const updated = [...prev];
-          updated[botIndex] = { role: 'bot', text: botMessage };
-          return updated;
-        });
-      };
-
-      eventSource.onerror = (err) => {
-        console.error('SSE 錯誤:', err);
-        eventSource.close();
-        setTyping(false);
-        setLoading(false);
-        setMessages(prev => [...prev, { role: 'bot', text: 'AI 回覆失敗，請稍後再試。' }]);
-      };
-
-      eventSource.onopen = () => {
-        console.log('SSE 連線成功');
-      };
-
-      eventSource.addEventListener('close', () => {
-        console.log('SSE 已關閉');
-        setTyping(false);
-        setLoading(false);
-      });
-
-      // 偵測最後一段，判斷完成
-      eventSource.addEventListener('end', () => {
-        eventSource.close();
-        setTyping(false);
-        setLoading(false);
-      });
-
-    } catch (err) {
-      console.error('發送錯誤：', err);
-      setMessages(prev => [...prev, { role: 'bot', text: '伺服器錯誤，請稍後再試。' }]);
-      setLoading(false);
+    es.addEventListener('end', () => {
+      es.close();
+      eventSourceRef.current = null;
       setTyping(false);
-    }
+      setLoading(false);
+    });
+
+    es.onerror = (err) => {
+      console.error('SSE 錯誤:', err);
+      es.close();
+      eventSourceRef.current = null;
+      setTyping(false);
+      setLoading(false);
+      setMessages(prev => [...prev, { role: 'bot', text: 'AI 回覆失敗，請稍後再試。' }]);
+    };
   };
 
   const handleKeyDown = (e) => {
@@ -132,7 +122,11 @@ const ChatBotPage = () => {
           onKeyDown={handleKeyDown}
           disabled={loading}
         />
-        <button onClick={sendMessage} disabled={loading} className="bg-blue-600 text-white px-4 py-2 rounded">
+        <button
+          onClick={sendMessage}
+          disabled={loading}
+          className="bg-blue-600 text-white px-4 py-2 rounded"
+        >
           {loading ? '回覆中...' : '送出'}
         </button>
       </div>
