@@ -2,7 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const ChatBotPage = () => {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(() => {
+    const saved = localStorage.getItem('chatHistory');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [typing, setTyping] = useState(false);
@@ -13,7 +16,7 @@ const ChatBotPage = () => {
     messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // 第一次載入時從後端抓取聊天紀錄
+  // 第一次載入從後端抓取歷史，並合併 localStorage 紀錄
   useEffect(() => {
     const fetchHistory = async () => {
       try {
@@ -21,10 +24,14 @@ const ChatBotPage = () => {
         const result = await res.json();
         if (result.status === 200) {
           const history = result.data || [];
-          if (history.length === 0) {
-            setMessages([{ role: 'bot', text: '您好，我是商城 AI 客服，有什麼可以幫您？' }]);
+          if (history.length === 0 && messages.length === 0) {
+            const welcome = [{ role: 'bot', text: '您好，我是商城 AI 客服，有什麼可以幫您？' }];
+            setMessages(welcome);
+            localStorage.setItem('chatHistory', JSON.stringify(welcome));
           } else {
-            setMessages(history);
+            const merged = [...history];
+            setMessages(merged);
+            localStorage.setItem('chatHistory', JSON.stringify(merged));
           }
         }
       } catch (err) {
@@ -36,6 +43,7 @@ const ChatBotPage = () => {
 
   useEffect(() => {
     scrollToBottom();
+    localStorage.setItem('chatHistory', JSON.stringify(messages));
   }, [messages]);
 
   const sendMessage = async () => {

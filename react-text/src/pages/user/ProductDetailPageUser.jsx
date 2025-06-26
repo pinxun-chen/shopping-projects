@@ -15,6 +15,7 @@ function ProductDetailPageUser() {
   const [editing, setEditing] = useState(false);
   const [replyMap, setReplyMap] = useState({});
   const [hasReviewed, setHasReviewed] = useState(false);
+  
 
   useEffect(() => {
     fetchProduct();
@@ -176,6 +177,7 @@ function ProductDetailPageUser() {
         setRating(0);
         setEditing(false);
         fetchReviews();
+        
       } else {
         alert(data.message);
       }
@@ -271,7 +273,7 @@ function ProductDetailPageUser() {
                 <div className="text-xs text-gray-500 mb-1">
                   👤 {r.username} ‧ {new Date(r.createdAt).toLocaleString()}
                 </div>
-                <div className="text-yellow-500 font-medium">⭐️ {r.rating} 分</div>
+                <div className="text-yellow-500 font-medium">⭐️ x {r.rating} </div>
                 <div className="text-sm text-gray-700 mb-2">{r.comment}</div>
                 {r.reply && (
                   <div className="text-sm text-blue-700 bg-blue-50 p-2 rounded mb-2">
