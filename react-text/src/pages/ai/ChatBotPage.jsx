@@ -13,7 +13,6 @@ const ChatBotPage = () => {
     messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // 第一次載入時從後端抓取聊天紀錄
   useEffect(() => {
     const fetchHistory = async () => {
       try {
@@ -41,58 +40,61 @@ const ChatBotPage = () => {
   const sendMessage = async () => {
     if (!input.trim()) return;
 
-    const userMsg = { role: 'user', text: input };
-    setMessages(prev => [...prev, userMsg]);
+    const userText = input;
+    setMessages(prev => [...prev, { role: 'user', text: userText }]);
     setInput('');
     setLoading(true);
     setTyping(true);
 
     try {
-      const res = await fetch('/api/ai/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: input }),
-        credentials: 'include'
+      const eventSource = new EventSource(`/api/ai/chat/stream?message=${encodeURIComponent(userText)}`, {
+        withCredentials: true,
       });
 
-      const result = await res.json();
-
-      if (res.status === 401 || res.status === 403) {
-        alert(result.message);
-        navigate('/login');
-        return;
-      }
-
-      const fullText = result.data?.response || 'AI 沒有回應';
-      const newIndex = messages.length + 1;
+      let botMessage = '';
+      const botIndex = messages.length + 1;
       setMessages(prev => [...prev, { role: 'bot', text: '' }]);
 
-      typeWriterEffect(fullText, newIndex);
+      eventSource.onmessage = (event) => {
+        botMessage += event.data;
+        setMessages(prev => {
+          const updated = [...prev];
+          updated[botIndex] = { role: 'bot', text: botMessage };
+          return updated;
+        });
+      };
+
+      eventSource.onerror = (err) => {
+        console.error('SSE 錯誤:', err);
+        eventSource.close();
+        setTyping(false);
+        setLoading(false);
+        setMessages(prev => [...prev, { role: 'bot', text: 'AI 回覆失敗，請稍後再試。' }]);
+      };
+
+      eventSource.onopen = () => {
+        console.log('SSE 連線成功');
+      };
+
+      eventSource.addEventListener('close', () => {
+        console.log('SSE 已關閉');
+        setTyping(false);
+        setLoading(false);
+      });
+
+      // 偵測最後一段，判斷完成
+      eventSource.addEventListener('end', () => {
+        eventSource.close();
+        setTyping(false);
+        setLoading(false);
+      });
 
     } catch (err) {
+      console.error('發送錯誤：', err);
       setMessages(prev => [...prev, { role: 'bot', text: '伺服器錯誤，請稍後再試。' }]);
       setLoading(false);
       setTyping(false);
     }
-  };
-
-  const typeWriterEffect = (text, msgIndex) => {
-    let index = 0;
-    const interval = setInterval(() => {
-      setMessages(prev => {
-        const updated = [...prev];
-        if (!updated[msgIndex]) return updated;
-        updated[msgIndex].text = text.slice(0, index + 1);
-        return updated;
-      });
-      index++;
-      if (index >= text.length) {
-        clearInterval(interval);
-        setLoading(false);
-        setTyping(false);
-        scrollToBottom();
-      }
-    }, 30);
   };
 
   const handleKeyDown = (e) => {

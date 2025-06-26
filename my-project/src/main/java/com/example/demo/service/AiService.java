@@ -52,38 +52,73 @@ public class AiService {
         return filterBadWords(response);
     }
 
-    public SseEmitter streamAiReply(String prompt, String username) {
-        SseEmitter emitter = new SseEmitter();
+    public SseEmitter streamAiReply(String prompt, String username,
+            	StringBuilder replyBuffer, Runnable onComplete) {
+    	SseEmitter emitter = new SseEmitter(0L);
 
-        new Thread(() -> {
-            try {
-                String systemInfo = analyzePrompt(prompt);
-                List<Message> messages = List.of(
-                        new SystemMessage(String.format("""
-                            你是一位親切且專業的客服，請使用繁體中文逐字回應會員的問題，稱呼對方為「%s」。
-                            回答內容只能根據提供的商品或訂單資訊，請勿捏造任何不存在的商品、價格或資訊。
-                            若使用者詢問價格、庫存、名稱等，請只根據提供清單回答，無資料時請明確說明。
-                            """, username)),
-                        new UserMessage(String.format("以下是商城參考資料：\n%s\n請根據上述資訊回答：%s", systemInfo, prompt))
-                );
+    	new Thread(() -> {
+    		try {
+    			if (containsBadWords(prompt)) {
+    				emitter.send(SseEmitter.event().data("您的提問包含不當字詞").name("message"));
+    				emitter.complete();
+    				return;
+    			}
 
-                Prompt p = new Prompt(messages);
+    			String systemInfo = analyzePrompt(prompt);
+    			List<Message> messages = List.of(
+    					new SystemMessage(String.format("""
+    							你是一位親切且專業的客服，請使用繁體中文逐字回應會員的問題，稱呼對方為「%s」。
+    							回答內容只能根據提供的商品或訂單資訊，請勿捏造任何不存在的商品、價格或資訊。
+    							若使用者詢問價格、庫存、名稱等，請只根據提供清單回答，無資料時請明確說明。
+    							""", username)),
+    					new UserMessage(String.format("以下是商城參考資料：\n%s\n請根據上述資訊回答：%s", systemInfo, prompt))
+    					);
 
-                chatClient.stream(p).doOnNext(chunk -> {
-                    try {
-                        emitter.send(chunk.getResult().getOutput().getContent(), MediaType.TEXT_PLAIN);
-                    } catch (IOException e) {
-                        emitter.completeWithError(e);
-                    }
-                }).doOnComplete(emitter::complete).subscribe();
+    			Prompt p = new Prompt(messages);
 
-            } catch (Exception e) {
-                emitter.completeWithError(e);
-            }
-        }).start();
+    			chatClient.stream(p)
+    			.doOnNext(delta -> {
+    				try {
+    					String content = delta.getResult().getOutput().getContent();
+    					content = filterBadWords(content); // 過濾不當字詞
+    					if (content != null && !content.isBlank()) {
+    						replyBuffer.append(content);
+    						emitter.send(SseEmitter.event().data(content).name("message"));
+    					}
+    				} catch (IOException | IllegalStateException e) {
+    					emitter.completeWithError(e);
+    				}
+    			})
+    			.doOnComplete(() -> {
+    				try {
+    					emitter.send(SseEmitter.event().data("[END]").name("end"));
+    					if (onComplete != null) {
+    						onComplete.run(); // 確保安全呼叫
+    					}
+    				} catch (Exception ignore) {}
+    				emitter.complete();
+    			})
+    			.doOnError(e -> {
+    				try {
+    					emitter.send(SseEmitter.event().data("發生錯誤").name("error"));
+    				} catch (Exception ignore) {}
+    				emitter.completeWithError(e);
+    			})
+    			.subscribe();
 
-        return emitter;
+    		} catch (Exception e) {
+    			try {
+    				emitter.send(SseEmitter.event().data("系統錯誤").name("error"));
+    			} catch (Exception ignore) {}
+    			emitter.completeWithError(e);
+    		}
+    	}).start();
+
+    	return emitter;
     }
+
+
+
 
     public String askWithUser(String prompt, String username) {
         return askWithUserAndProducts(prompt, username);

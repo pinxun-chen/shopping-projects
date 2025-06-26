@@ -69,8 +69,23 @@ public class AiApiController {
             throw new RuntimeException("請先登入會員才能使用串流 AI 客服功能");
         }
 
-        return aiService.streamAiReply(message, cert.getUsername());
+        String username = cert.getUsername();
+        StringBuilder replyBuffer = new StringBuilder();
+
+        // 串流完成時儲存聊天紀錄
+        Runnable onComplete = () -> {
+            List<Map<String, String>> chatHistory =
+                    (List<Map<String, String>>) session.getAttribute("chatHistory");
+            if (chatHistory == null) chatHistory = new java.util.ArrayList<>();
+
+            chatHistory.add(Map.of("role", "user", "text", message));
+            chatHistory.add(Map.of("role", "bot", "text", replyBuffer.toString()));
+            session.setAttribute("chatHistory", chatHistory);
+        };
+
+        return aiService.streamAiReply(message, username, replyBuffer, onComplete);
     }
+
 
     // 聊天紀錄
     @GetMapping("/history")
