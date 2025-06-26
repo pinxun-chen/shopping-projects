@@ -4,14 +4,19 @@ import com.example.demo.model.dto.OrderDto;
 import com.example.demo.model.dto.ProductDto;
 import com.example.demo.model.dto.ProductVariantDto;
 import com.example.demo.repository.OrderRepository;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.ollama.OllamaChatClient;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -47,6 +52,39 @@ public class AiService {
         return filterBadWords(response);
     }
 
+    public SseEmitter streamAiReply(String prompt, String username) {
+        SseEmitter emitter = new SseEmitter();
+
+        new Thread(() -> {
+            try {
+                String systemInfo = analyzePrompt(prompt);
+                List<Message> messages = List.of(
+                        new SystemMessage(String.format("""
+                            你是一位親切且專業的客服，請使用繁體中文逐字回應會員的問題，稱呼對方為「%s」。
+                            回答內容只能根據提供的商品或訂單資訊，請勿捏造任何不存在的商品、價格或資訊。
+                            若使用者詢問價格、庫存、名稱等，請只根據提供清單回答，無資料時請明確說明。
+                            """, username)),
+                        new UserMessage(String.format("以下是商城參考資料：\n%s\n請根據上述資訊回答：%s", systemInfo, prompt))
+                );
+
+                Prompt p = new Prompt(messages);
+
+                chatClient.stream(p).doOnNext(chunk -> {
+                    try {
+                        emitter.send(chunk.getResult().getOutput().getContent(), MediaType.TEXT_PLAIN);
+                    } catch (IOException e) {
+                        emitter.completeWithError(e);
+                    }
+                }).doOnComplete(emitter::complete).subscribe();
+
+            } catch (Exception e) {
+                emitter.completeWithError(e);
+            }
+        }).start();
+
+        return emitter;
+    }
+
     public String askWithUser(String prompt, String username) {
         return askWithUserAndProducts(prompt, username);
     }
@@ -54,7 +92,6 @@ public class AiService {
     private String analyzePrompt(String prompt) {
         prompt = prompt.toLowerCase();
 
-        // 價格範圍
         Pattern pricePattern = Pattern.compile("(\\d{2,5})[^\\d]*(\\d{2,5})");
         Matcher matcher = pricePattern.matcher(prompt);
         if (prompt.contains("價格") && matcher.find()) {
@@ -73,7 +110,6 @@ public class AiService {
             return buildProductInfo(products, String.format("價格在 $%d 到 $%d 的商品：", min, max));
         }
 
-        // 查詢庫存 / 尺寸
         if (prompt.contains("有沒有") || prompt.contains("庫存") || prompt.contains("尺寸")) {
             List<ProductDto> all = productService.getAllProducts();
             StringBuilder result = new StringBuilder("以下為部分商品的尺寸與庫存：\n");
@@ -87,7 +123,6 @@ public class AiService {
             return result.toString();
         }
 
-        // 查詢訂單進度
         if (prompt.contains("訂單") && prompt.matches(".*\\d{4,}.*")) {
             Pattern idPattern = Pattern.compile("(\\d{4,})");
             Matcher idMatch = idPattern.matcher(prompt);
@@ -107,7 +142,6 @@ public class AiService {
             }
         }
 
-        // 關鍵字搜尋商品
         List<ProductDto> matchedProducts = productService.searchProductsForPrompt(prompt);
         if (!matchedProducts.isEmpty()) {
             return buildProductInfo(matchedProducts, "以下是我們推薦的商品：");
